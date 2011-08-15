@@ -1,0 +1,10 @@
+*~
+*.o
+.DS_Store?
+
+/build
+/dist
+/doc/
+/doc/
+
+MANIFEST
