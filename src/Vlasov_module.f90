@@ -9,6 +9,10 @@
 !! The storage of the one-particle phase space distribution function is found in the array f.
 !! Storage of a copy of f is necessary for the algorithm, as it is written at the moment.
 !! 
+!! The semi-Lagrangian methodology that is used in this code is found in 
+!! E. Sonnendrucker, J. Roche, P. Bertrand and A. Ghizzo. The Semi-Lagrangian Method for the 
+!! Numerical Resolution of the Vlasov Equation, J. Comp. Phys. vol. 149, pp. 201-220 (1999).
+!!
 
 module Vlasov_module
   use spline_module

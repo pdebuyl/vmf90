@@ -1,3 +1,17 @@
+!> This module defines a Vlasov setup for the Hamiltonian Mean-Field model.
+!!
+!! Routines are provided to compute the force field, the thermodynamical observables and the energy
+!! distribution function.
+!!
+!! The HMF model has been introduced in
+!! M. Antoni & S. Ruffo, Clustering and relaxation in Hamiltonian long-range dynamics, Phys. Rev. E
+!! vol. 52, pp. 2361-2374 (1995).
+!!
+!! Results of Vlasov simulations for the HMF model are found in
+!! P. de Buyl, Numerical resolution of the Vlasov equation for the Hamiltonian Mean-Field model, 
+!! Commun. Nonlinear Sci. Numer. Simulat. vol. 15, pp. 2133-2139 (2010).
+!!
+
 module HMF_module
   use Vlasov_module
   implicit none
