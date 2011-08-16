@@ -35,6 +35,7 @@ module Vlasov_module
      double precision, allocatable :: ux(:), uv(:)
   end type grid
 
+  !> The type datafile_h5 is used to store HDF5 variables for a Vlasov simulation.
   type datafile_h5
      character(len=64) :: filename
      character(len=4) :: info_g_name="info"
@@ -56,6 +57,18 @@ module Vlasov_module
 
   contains
 
+    !> Creates a new type(grid) variable with given dimensions.
+    !! 
+    !! The routine new allocates data arrays and sets all the descriptive variables of the type(grid)
+    !! variable.
+    !! @param this A type(grid) variable.
+    !! @param Nx The number of grid points in the x-direction.
+    !! @param Nv The number of grid points in the v-direction.
+    !! @param xmax The maximum x coordinate.
+    !! @param xmin The minimum x coordinate.
+    !! @param vmax The maximum v coordinate.
+    !! @param vmin The minimum v coordinate.
+    !! @param is_periodic Sets the type(grid) variable to be periodic or not.
     subroutine new(this,Nx,Nv,xmax,vmax,xmin,vmin,is_periodic)
       type(grid), intent(out) :: this
       integer, intent(in) :: Nx, Nv
@@ -116,36 +129,62 @@ module Vlasov_module
 
     end subroutine new
 
+    !> Sets the timestep for the grid.
+    !! @param this A type(grid) variable.
+    !! @param DT The timestep.
     subroutine set_DT(this,DT)
       type(grid), intent(inout) :: this
       double precision, intent(in) :: DT
       this%DT=DT
     end subroutine set_DT
+    !> Returns the time step for the type(grid) variable.
+    !! @param this A type(grid) variable.
+    !! @return The timestep.
     double precision function get_DT(this)
       type(grid), intent(in) :: this
       get_DT = this%DT
     end function get_DT
+    !> Returns the maximum x coordinate for the type(grid) variable.
+    !! @param this A type(grid) variable.
+    !! @return xmax.
     double precision function get_xmax(this)
       type(grid), intent(in) :: this
       get_xmax = this%xmax
     end function get_xmax
+    !> Returns the minimum x coordinate for the type(grid) variable.
+    !! @param this A type(grid) variable.
+    !! @return xmin.
     double precision function get_xmin(this)
       type(grid), intent(in) :: this
       get_xmin = this%xmin
     end function get_xmin
+    !> Returns the maximum v coordinate for the type(grid) variable.
+    !! @param this A type(grid) variable.
+    !! @return vmax.
     double precision function get_vmax(this)
       type(grid), intent(in) :: this
       get_vmax = this%vmax
     end function get_vmax
+    !> Returns the minimum v coordinate for the type(grid) variable.
+    !! @param this A type(grid) variable.
+    !! @return vmin.
     double precision function get_vmin(this)
       type(grid), intent(in) :: this
       get_vmin = this%vmin
     end function get_vmin
+    !> Returns the x coordinate for the type(grid) variable for the column index ix.
+    !! @param this A type(grid) variable.
+    !! @param ix A column index for the position.
+    !! @return x.
     double precision function get_x(this,ix)
       type(grid), intent(in) :: this
       integer, intent(in) :: ix
       get_x = this%xmin + (ix-1)*this%dx
     end function get_x
+    !> Returns the v coordinate for the type(grid) variable for the row index mv.
+    !! @param this A type(grid) variable.
+    !! @param mv A row index for the velocity.
+    !! @return v.
     double precision function get_v(this,mv)
       type(grid), intent(in) :: this
       integer, intent(in) :: mv
@@ -173,10 +212,12 @@ module Vlasov_module
 
     !> Returns the interpolated value on the m-th row of the grid.
     !!
+    !! If the grid is periodic, takes it into account. Else, returns 0 outside of the box.
+    !!
     !! @param this A type(grid) variable.
     !! @param x_in The point at which to interpolate.
     !! @param m The velocity row index.
-    !! @Returns Interpolated value of f.
+    !! @return Interpolated value of f.
     double precision function splint_x(this,x_in,m)
       type(grid), intent(in) :: this
       double precision, intent(in) :: x_in
@@ -203,6 +244,9 @@ module Vlasov_module
       
     end function splint_x
     
+    !> Computes the second derivatives for spline interpolation in the v-direction.
+    !!
+    !! @param this A type(grid) variable.
     subroutine spline_v(this)
       type(grid), intent(inout) :: this
 
@@ -214,6 +258,14 @@ module Vlasov_module
 
     end subroutine spline_v
 
+    !> Returns the interpolated value on the i-th column of the grid.
+    !!
+    !! Returns 0 outside of the box.
+    !!
+    !! @param this A type(grid) variable.
+    !! @param v The point at which to interpolate.
+    !! @param i The position column index.
+    !! @return Interpolated value of f.
     double precision function splint_v(this,v,i)
       type(grid), intent(in) :: this
       double precision, intent(in) :: v

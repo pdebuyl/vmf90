@@ -1,4 +1,8 @@
 !> Module for the computation of natural and periodic spline interpolation.
+!!
+!! The natural spline has zero-valued second derivatives at the boundaries. The periodic splines
+!! are assuming a periodic data series. The interpolation step is done with spline_2 for both 
+!! kinds of splines.
 
 module spline_module
   implicit none
@@ -114,6 +118,7 @@ contains
   !! @param dx The grid stepsize.
   !! @param y2 The second derivative of the data.
   !! @param x The point at which the evaluation is made.
+  !! @return The interpolated value at x.
   function spline_2(y,dx,y2,x)
     implicit none
     double precision :: spline_2
