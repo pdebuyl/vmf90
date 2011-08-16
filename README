@@ -65,8 +65,8 @@ of this software. The latest citation suggestion is ::
 
     P. de Buyl, "vmf90 - A Vlasov solver for mean-field systems in Fortran 90"
     http://homepages.ulb.ac.be/~pdebuyl/vmf90/.
-    P. de Buyl, Numerical resolution of the Vlasov equation for the Hamiltonian
-    Mean-Field model, Commun. Nonlinear Sci. Numer. Simulat. vol. 15,
+    P. de Buyl, "Numerical resolution of the Vlasov equation for the Hamiltonian
+    Mean-Field model", Commun. Nonlinear Sci. Numer. Simulat. vol. 15,
     pp. 2133-2139 (2010).
 
 Please check the vmf90 homepage to see if a more recent reference is appropriate.
