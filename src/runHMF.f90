@@ -18,7 +18,6 @@ program runHMF
   integer, parameter :: nc=3
   real*4 :: perim(nc), z(nc)
   real*4, allocatable :: data(:,:), x(:), y(:)
-  logical :: do_conrec
   double precision :: com
   integer, parameter :: time_number = 11
   double precision :: vals(time_number)
@@ -36,7 +35,6 @@ program runHMF
   DT = PTread_d(HCF,'DT')
   IC = PTread_s(HCF,'IC')
   n_images = PTread_i(HCF, 'n_images')
-  do_conrec = PTread_l(HCF, 'perimeter')
   t_images = 1
 
   call newHMF(H,Nx,Nv,vmax, Nedf=PTread_i(HCF,'Nedf'), model=PTread_s(HCF, 'model'), epsilon=PTread_d(HCF, 'epsilon'), Hfield=PTread_d(HCF,'Hfield'))
