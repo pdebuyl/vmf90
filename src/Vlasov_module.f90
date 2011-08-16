@@ -1,3 +1,15 @@
+!> This module provides facilities to describe a (x,p) phase space grid and to perform
+!! operations on it to solve the Vlasov equation with the second order Cheng-Knorr splitting,
+!! for now only with cubic spline interpolation.
+!!
+!! Utility routines are provided for setting up the system and to obtain grid information such
+!! as position and velocity, on the basis of the indices, or computation of the position- and 
+!! velocity marginals.
+!!
+!! The storage of the one-particle phase space distribution function is found in the array f.
+!! Storage of a copy of f is necessary for the algorithm, as it is written at the moment.
+!! 
+
 module Vlasov_module
   use spline_module
   use HDF5
@@ -6,6 +18,8 @@ module Vlasov_module
 !  double precision, parameter :: PI = 3.141592653589793115997963468544185161590576171875d0 !atan(1.d0)*4.d0
   double precision, parameter :: PI = atan(1.d0)*4.d0
 
+  !> The type grid allows to describe (position and velocity coordinates) and store (array f) a 
+  !! numerical distribution function in the one-particle phase space.
   type grid
      integer :: Nx, Nv
      double precision :: xmin, xmax, vmin, vmax
@@ -139,6 +153,9 @@ module Vlasov_module
     end function get_v
 
 
+    !> Computes the second derivatives for spline interpolation in the x-direction.
+    !!
+    !! @param this A type(grid) variable.
     subroutine spline_x(this)
       type(grid), intent(inout) :: this
 
@@ -148,11 +165,18 @@ module Vlasov_module
       this%f(this%Nx+1,:) = this%f(1,:)
 
       do m=1,this%Nv
-         call spline_fix(this%xmin,this%dx,this%f(:,m),0.5d0*(this%f(2,m)-this%f(this%Nx,m))/this%dx,0.5d0*(this%f(2,m)-this%f(this%Nx,m))/this%dx,this%f2(:,m))
+         call spline_periodic(this%f(1:this%Nx,m), this%dx, this%f2(1:this%Nx,m))
+         this% f2(this%Nx+1,m) = this% f2(1,m)
       end do
 
     end subroutine spline_x
 
+    !> Returns the interpolated value on the m-th row of the grid.
+    !!
+    !! @param this A type(grid) variable.
+    !! @param x_in The point at which to interpolate.
+    !! @param m The velocity row index.
+    !! @Returns Interpolated value of f.
     double precision function splint_x(this,x_in,m)
       type(grid), intent(in) :: this
       double precision, intent(in) :: x_in
@@ -175,7 +199,7 @@ module Vlasov_module
          end if
       end if
 
-      splint_x = splint_fix(this%xmin,this%dx,this%f(:,m),this%f2(:,m),x)
+      splint_x = spline_2(this% f(:,m), this% dx, this% f2(:,m), x - this% xmin)
       
     end function splint_x
     
@@ -185,7 +209,7 @@ module Vlasov_module
       integer i
       
       do i=1,this%Nx
-         call spline_fix(this%vmin,this%dv,this%f(i,:),0.d0,0.d0,this%f2(i,:))
+         call spline_natural(this% f(i,:), this% dv, this% f2(i,:))
       end do
 
     end subroutine spline_v
@@ -200,7 +224,7 @@ module Vlasov_module
          return
       end if
 
-      splint_v = splint_fix(this%vmin,this%dv,this%f(i,:),this%f2(i,:),v)
+      splint_v = spline_2(this% f(i,:), this% dv, this% f2(i,:), v - this% vmin)
       
     end function splint_v
 

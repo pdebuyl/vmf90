@@ -25,32 +25,6 @@ program runHMF
   character(len=32) :: time_names(time_number), IC
   character(len=13) :: fname
 
-! declaration for the routines allowing the inversion of m = m(width)
-  external zbrent, ftbz
-  double precision zbrent
-
-  interface 
-     subroutine conrec(d,ilb,iub,jlb,jub,x,y,nc,z,funit,s)
-       real*4, intent(in) :: d(ilb:iub,jlb:jub)
-       integer, intent(in) :: ilb, iub, jlb, jub
-       real*4, intent(in) :: x(ilb:iub), y(jlb:jub)
-       integer, intent(in) :: nc
-       real*4, intent(in) :: z(nc)
-       integer, intent(in) :: funit
-       real*4, intent(out) :: s(nc)
-     end subroutine conrec
-  end interface
-! declaration for the contour routine
-!     subroutine conrec(d,ilb,iub,jlb,jub,x,y,nc,z, s)
-!     real*8 d(ilb:iub,jlb:jub)  ! matrix of data to contour
-!     integer ilb,iub,jlb,jub    ! index bounds of data matrix
-!     real*8 x(ilb:iub)          ! data matrix column coordinates
-!     real*8 y(jlb,jub)          ! data matrix row coordinates
-!     integer nc                 ! number of contour levels
-!     real*8 z(1:nc)             ! contour levels in increasing order
-!     real*8 s(nc)               ! length of the contour, one length by contour
-!  external conrec
-
 ! Parse config file and create HMF and datafile data
 
   call PTparse(HCF,'HMF_in',7)
@@ -98,53 +72,6 @@ program runHMF
      epsilon = PTread_d(HCF,'epsilon')
      call init_carre(H%V, width, bag, epsilon=epsilon)
      H%f0 = 1d0/(4*width*bag)
-  else if (IC.eq.'wb_m0') then
-     e0 = PTread_d(HCF, 'e0')
-     m0 = PTread_d(HCF, 'm0')
-     if (m0.lt.0.001d0) then
-        width=PI
-     else if (m0.gt.0.99d0) then
-        stop 'too singular (close to 0) width for the waterbag'
-     else
-        width = zbrent(ftbz, 1d-8,4.d0*atan(1.d0), m0, 1d-6)
-     end if
-     bag = sqrt(6.d0*(e0-0.5d0+m0**2*0.5d0))
-     call init_carre(H%V, width, bag)
-     H%f0 = 1d0/(4*width*bag)
-  else if (IC.eq.'wb_m0_eps') then
-     e0 = PTread_d(HCF, 'e0')
-     m0 = PTread_d(HCF, 'm0')
-     epsilon = PTread_d(HCF,'epsilon')
-     if (m0.lt.0.001d0) then
-        width=PI
-     else if (m0.gt.0.99d0) then
-        stop 'too singular (close to 0) width for the waterbag'
-     else
-        width = zbrent(ftbz, 1d-8,4.d0*atan(1.d0), m0, 1d-6)
-     end if
-     bag = sqrt(6.d0*(e0-0.5d0+m0**2*0.5d0))
-     call init_carre(H%V, width, bag,epsilon=epsilon)
-     H%f0 = 1d0/(4*width*bag)
-     
-     
-  else if (IC.eq.'gaussian') then
-     e0 = PTread_d(HCF, 'e0')
-     if (e0.le.0.5d0) then
-        stop 'e0 lt 0.5 in gaussian IC'
-     end if
-     call init_gaussian(H%V, 0.5d0/(e0-0.5d0))
-     write(*,*) sum(H%V%f)*H%V%dx*H%V%dv
-  else if (IC.eq.'gauss_beta_eps') then
-     call init_gaussian(H%V, beta=PTread_d(HCF, 'beta'), epsilon=PTread_d(HCF,'epsilon'))
-     write(*,*) sum(H%V%f(1:H%V%Nx,:))*H%V%dx*H%V%dv-1.d0
-  else if (IC.eq.'gaussian_eps') then
-     e0 = PTread_d(HCF, 'e0')
-     epsilon = PTread_d(HCF,'epsilon')
-     if (e0.le.0.5d0) then
-        stop 'e0 lt 0.5 in gaussian IC'
-     end if
-     call init_gaussian(H%V, 0.5d0/(e0-0.5d0),epsilon=epsilon)
-     write(*,*) sum(H%V%f)*H%V%dx*H%V%dv
   else if (IC.eq.'fermi_eps') then
      width = PTread_d(HCF, 'beta')
      e0 = PTread_d(HCF, 'a')
@@ -158,10 +85,6 @@ program runHMF
      norme = sum(H%V%f(1:H%V%Nx,:))* H%V%dx * H%V%dv
      H%V%f = H%V%f / norme
      write(*,*) sum(H%V%f(1:H%V%Nx,:))*H%V%dx*H%V%dv-1.d0
-  else if (IC.eq.'two_streams') then
-     call init_two_streams(H%V, PTread_d(HCF,'v_min'), PTread_d(HCF, 'v_max'))
-  else if (IC.eq.'two_streams_width') then
-     call init_two_streams(H%V, PTread_d(HCF,'v_min'), PTread_d(HCF, 'v_max'), width=PTread_d(HCF,'width'))
   else
      stop 'unknown IC'
   end if
@@ -172,24 +95,6 @@ program runHMF
 
 ! fin de la condition initiale
 
-!
-! data is a real*4 array that will be passed to conrec, the contouring subroutine
-! x and y are real*4 array for the x and v position arrays to be passed to conrec
-! z(:) is a list of values at which the perimeter is to be computed
-!
-
-  if (do_conrec) then
-     allocate(data(0:H%V%Nx-1,0:H%V%Nv-1))
-     allocate(x(0:H%V%Nx-1)) ; allocate(y(0:H%V%Nv-1))
-     data = 0.
-     x = (/ (real(H%V%xmin)+real(i)*real(H%V%dx), i=0, H%V%Nx-1) /)
-     y = (/ (real(H%V%vmin)+real(m)*real(H%V%dv), m=0, H%V%Nv-1) /)
-     z(1) = real(H%f0*0.25d0)
-     z(2) = real(H%f0*0.5d0)
-     z(3) = real(H%f0*0.75d0)
-
-     open(17, file='t_perim')
-  end if
   
 ! Simulation
 
@@ -207,15 +112,6 @@ program runHMF
   if (allocated(H%edf)) then
      call compute_edf(H)
      call write_edf_h5(h5hmf, H, t_top)
-  end if
-
-  if (do_conrec) then
-     write(fname, '(a8,i5.5)') 'images/c', t_top
-     open(18, file=fname)
-     data(0:H%V%Nx-1,0:H%V%Nv-1) = real(H%V%f(1:H%V%Nx,1:H%V%Nv))
-     call conrec(data, 0, H%V%Nx-1, 0,H%V%Nv-1, x, y, nc, z, 18, perim)
-     close(18)
-     write(17,'(4e20.12)') t_top*n_steps*DT, perim(1), perim(2), perim(3)
   end if
 
 
@@ -261,24 +157,9 @@ program runHMF
            call compute_edf(H)
            call write_edf_h5(h5hmf, H, t_top)
         end if
-        if (do_conrec) then
-           write(fname, '(a8,i5.5)') 'images/c', t_top
-           open(18, file=fname)
-           data(0:H%V%Nx-1,0:H%V%Nv-1) = real(H%V%f(1:H%V%Nx,1:H%V%Nv))
-           call conrec(data, 0, H%V%Nx-1, 0,H%V%Nv-1, x, y, nc, z, 18, perim)
-           close(18)
-        end if
      end if
      call write_time_slice_h5(h5hmf, t_top, vals)
 
-     if (do_conrec) then
-        data(0:H%V%Nx-1,0:H%V%Nv-1) = real(H%V%f(1:H%V%Nx,1:H%V%Nv))
-        call conrec(data, 0, H%V%Nx-1, 0,H%V%Nv-1, x, y, nc, z, 0, perim)
-
-        write(17,'(4e20.12)') t_top*n_steps*DT, perim(1), perim(2), perim(3)
-     end if
-
-     
 !     call h5fflush_f(h5hmf%file_id, H5F_SCOPE_GLOBAL_F, h5hmf%error)
 
   end do
@@ -288,16 +169,5 @@ program runHMF
 !
 
   call close_h5(h5hmf)
-  if (do_conrec) then
-     close(17)
-  end if
 
 end program runHMF
-
-function ftbz(s_theta,bunching)
-  implicit none
-  double precision s_theta, bunching, ftbz
-
-  ftbz = sin(s_theta)/s_theta - bunching
-
-end function ftbz
