@@ -284,7 +284,10 @@ module Vlasov_module
       
     end function splint_v
 
-    
+
+    !> Performs a half timestep advection in the x-direction.
+    !!
+    !! @param this A type(grid) variable.
     subroutine advection_x_demi(this)
       type(grid), intent(inout) :: this
       
@@ -298,6 +301,9 @@ module Vlasov_module
 
     end subroutine advection_x_demi
 
+    !> Performs a full timestep advection in the x-direction.
+    !!
+    !! @param this A type(grid) variable.
     subroutine advection_x(this)
       type(grid), intent(inout) :: this
       
@@ -311,6 +317,9 @@ module Vlasov_module
 
     end subroutine advection_x
 
+    !> Performs a full timestep advection in the v-direction.
+    !!
+    !! @param this A type(grid) variable.
     subroutine advection_v(this)
       type(grid), intent(inout) :: this
 
@@ -323,7 +332,15 @@ module Vlasov_module
       end do
          
     end subroutine advection_v
-
+    
+    !> Writes the distribution function f in a file of name "xvf.iiiii" in the directory
+    !! "images" that should exist beforehand.
+    !!
+    !! The optional "set_name" argument allows to postfix the filename with one character.
+    !! @param this A type(grid) variable.
+    !! @param itime The integer time on which the filename is based.
+    !! @param unit The Fortran file unit to use.
+    !! @param set_name An optional one character postfix.
     subroutine xvf_write(this,itime,unit,set_name)
       type(grid), intent(in) :: this
       integer, intent(in) :: itime,unit
@@ -350,6 +367,10 @@ module Vlasov_module
       close(unit)
     end subroutine xvf_write
 
+    !> Computes the position-wise marginal distribution.
+    !!
+    !! \f$ \rho_i = \int_{-v_{max}}^{v_{max}} f(x,v) dv
+    !! @param this A type(grid) variable.
     subroutine compute_rho(this)
       type(grid), intent(inout) :: this
 
@@ -357,12 +378,15 @@ module Vlasov_module
 
       do i=1,this%Nx
          this%rho(i) = sum(this%f(i,:))
-!         this%rho(i) = this%rho(i) - (this%f(i,1)+this%f(i,this%Nv))*0.5d0
          this%rho(i) = this%rho(i) * this%dv
       end do
     
     end subroutine compute_rho
 
+    !> Computes the velocity-wise marginal distribution.
+    !!
+    !! \f$ \phi_i = \int_{-x_{max}}^{x_{max}} f(x,v) dx
+    !! @param this A type(grid) variable.
     subroutine compute_phi(this)
       type(grid), intent(inout) :: this
       
@@ -375,6 +399,16 @@ module Vlasov_module
 
     end subroutine compute_phi
 
+    !> Initializes the distribution function f with a waterbag distribution.
+    !!
+    !! The waterbag is delimited by [-width:width] in position and [-bag:bag] in velocity.
+    !! The optional argument epsilon allows to apply a perturbation in the form \f$ f \propto 1+\epsilon\cos x\f$
+    !! to the distribution. The parameter p0 allows to shift the c.o.m. velocity by p0.
+    !! @param this A type(grid) variable.
+    !! @param width Half-width of the waterbag distribution.
+    !! @param bag Half-width in velocity of the waterbag distribution.
+    !! @param epsilon Amplitude of the cosine perturbation.
+    !! @param p0 Shift of the center of mass velocity.
     subroutine init_carre(this, width, bag, epsilon, p0)
       type(grid), intent(inout) :: this
       double precision, intent(in) :: width, bag
@@ -439,7 +473,13 @@ module Vlasov_module
 
     end subroutine init_two_streams
 
-    subroutine init_gaussian(this, beta, epsilon)
+    !> Initializes the distribution function with an homogeneous gaussian distribution.
+    !!
+    !! An optional perturbation epsilon can be applied.
+    !! @param this A type(grid) variable.
+    !! @param beta The inverse temperature of the distribution.
+    !! @param epsilon The amplitude of the sinusoidal perturbation.
+   subroutine init_gaussian(this, beta, epsilon)
       type(grid), intent(inout) :: this
       double precision, intent(in) :: beta
       double precision, intent(in), optional :: epsilon

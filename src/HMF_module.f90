@@ -18,18 +18,45 @@ module HMF_module
 
 !  double precision, parameter :: PI = 3.141592653589793115997963468544185161590576171875 !atan(1.d0)*4.d0
 
+  !> This type holds the data to describe a HMF system.
   type HMF
+     !> The grid holding the distribution function.
      type(grid) :: V
-     double precision :: Mx, My
+     !> The x component of the magnetization.
+     double precision :: Mx
+     !> The y component of the magnetization.
+     double precision :: My
+     !> The height of the waterbag.
      double precision :: f0
+     !> The energy distribution function.
      double precision, allocatable :: edf(:)
-     double precision :: e_min, e_max, de
+     !> Minimum for the energy DF.
+     double precision :: e_min
+     !> Maximum for the energy DF.
+     double precision :: e_max
+     !> Step for the energy DF.
+     double precision :: de
+     !> If true, an external field is applied.
      logical :: is_ext
-     double precision :: epsilon, Hfield
+     !> Optional coupling parameter.
+     double precision :: epsilon
+     !> External field.
+     double precision :: Hfield
   end type HMF
   
 contains
   
+  !> Initializes a HMF variable.
+  !!
+  !! @param this A type(HMF) variable.
+  !! @param Nx The number of grid points in the x direction.
+  !! @param Nv The number of grid points in the v direction.
+  !! @param vmax Upper bound of the box in velocity.
+  !! @param vmin Lower bound of the box in velocity.
+  !! @param Nedf Number of points for the energy DF.
+  !! @param model Textual declaration of the model.
+  !! @param epsilon Coupling parameter.
+  !! @param Hfield External field.
   subroutine newHMF(this,Nx,Nv,vmax,vmin, Nedf, model, epsilon, Hfield)
     type(HMF), intent(out) :: this
     integer, intent(in) :: Nx, Nv
@@ -70,6 +97,9 @@ contains
 
   end subroutine newHMF
   
+  !> Computes the magnetization.
+  !!
+  !! @param this A type(HMF) variable.
   subroutine compute_M(this)
     type(HMF), intent(inout) :: this
 
@@ -86,6 +116,9 @@ contains
 
   end subroutine compute_M
 
+  !> Computes the force field.
+  !!
+  !! @param this A type(HMF) variable.
   subroutine compute_force(this)
     type(HMF), intent(inout) :: this
     
@@ -105,6 +138,11 @@ contains
 
   end subroutine compute_force
 
+  !> Computes the macroscopic observables.
+  !!
+  !! @param this A type(HMF) variable.
+  !! @param phys An array holding the observables.
+  !! @param time The real-valued time. Is inserted with the observables in phys.
   subroutine compute_phys(this, phys, time)
     type(HMF), intent(inout) :: this
     double precision, intent(out) :: phys(:)
@@ -149,6 +187,9 @@ contains
 
   end subroutine compute_phys
 
+  !> Computes the energy distribution function.
+  !!
+  !! @param this A type(HMF) variable.
   subroutine compute_edf(this)
     type(HMF), intent(inout) :: this
 
