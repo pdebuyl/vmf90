@@ -2,8 +2,9 @@
 from sys import argv
 
 if (len(argv)<3):
-  print "Usage : python show_HMF.py filename.h5 cmd"
+  print "Usage : %s show_HMF.py filename.h5 cmd" % argv[0]
   print "        where cmd is one of en, mass, m, mxy, rho, phi, snaps"
+  exit()
 
 import h5py
 import numpy as np
