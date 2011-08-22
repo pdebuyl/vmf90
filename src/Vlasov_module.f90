@@ -19,8 +19,8 @@ module Vlasov_module
   use HDF5
   implicit none
 
-!  double precision, parameter :: PI = 3.141592653589793115997963468544185161590576171875d0 !atan(1.d0)*4.d0
-  double precision, parameter :: PI = atan(1.d0)*4.d0
+  !> Value of Pi computed via N[Pi,35] in Mathematica
+  double precision, parameter :: PI = 3.1415926535897932384626433832795029d0
 
   !> The type grid allows to describe (position and velocity coordinates) and store (array f) a 
   !! numerical distribution function in the one-particle phase space.
