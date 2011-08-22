@@ -16,8 +16,6 @@ module HMF_module
   use Vlasov_module
   implicit none
 
-!  double precision, parameter :: PI = 3.141592653589793115997963468544185161590576171875 !atan(1.d0)*4.d0
-
   !> This type holds the data to describe a HMF system.
   type HMF
      !> The grid holding the distribution function.
