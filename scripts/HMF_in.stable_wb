@@ -1,0 +1,14 @@
+model = HMF                  ! the model name. is checked in the program 
+out_file = hmf.h5            ! filename for output data 
+Nx = 256                     ! number of points in x-direction 
+Nv = 512                     ! number of points in v-direction
+vmax = 2.5                   ! size of the box
+DT = 0.1                     ! timestep
+n_steps = 5                  ! number of steps in inner loop
+n_top = 300                  ! number of executions for inner loop
+n_images = 50                ! number of dumps of the phase space DF
+IC = wb_eps                  ! initial condition
+width = 4.                   ! \Delta\theta for initial condition
+bag = 0.72                   ! \Delta p for initial condition
+epsilon = 0.001              ! initial perturbation of the profile
+Nedf = 0                     ! number of points for energy DF
