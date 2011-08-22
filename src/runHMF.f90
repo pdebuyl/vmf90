@@ -41,15 +41,12 @@ program runHMF
   H%V%DT = DT
   call create_h5(h5hmf, H%V, PTread_s(HCF, 'out_file'), n_top, time_number)
 
-  write(*,'(3f30.26)') H%V%xmin, get_x(H%V,H%V%Nx), H%V%xmax
-  write(*,'(2f30.26)') sin(H%V%xmin), sin(H%V%xmax)
 
   time_names = (/'time    ', 'mass    ', 'energy  ', 'int     ', 'kin     ', 'momentum', 'Mx      ', 'My      ', 'I2      ', 'I3      ', 'entropy '/)
   call write_info_string_array_h5(h5hmf, 'time_names', time_names)
 
 
-  write(*,*) 'launching HMF with ', Nx, 'x', Nv,  'points'
-  write(*,*) 'is_ext', H%is_ext
+  write(*,*) 'Running HMF with ', Nx, 'x', Nv,  'points'
 
   if (allocated(H%edf)) then
      call write_info_double_h5(h5hmf, 'e_min', H%e_min)
@@ -157,8 +154,6 @@ program runHMF
         end if
      end if
      call write_time_slice_h5(h5hmf, t_top, vals)
-
-!     call h5fflush_f(h5hmf%file_id, H5F_SCOPE_GLOBAL_F, h5hmf%error)
 
   end do
 
