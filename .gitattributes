@@ -1,0 +1,4 @@
+src/vmf90_version.h.in export-ignore 
+scripts/Makefile export-ignore
+.gitignore export-ignore
+.gitattributes export-ignore

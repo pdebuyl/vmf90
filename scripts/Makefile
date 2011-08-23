@@ -19,9 +19,9 @@ F90 = h5fc -O3
 VPATH = ../src
 all : runHMF
 
-vmf90_version.h: vmf90_version.h.in FORCE
-	../scripts/make_version.sh
-FORCE:
+vmf90_version.h: vmf90_version.h.in FORCE    # TOREMOVE
+	../scripts/make_version.sh           # TOREMOVE
+FORCE:                                       # TOREMOVE
 
 vmf90.o: vmf90.f90 vmf90_version.h
 	$(F90) -c $<
