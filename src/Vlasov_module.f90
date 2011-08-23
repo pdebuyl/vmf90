@@ -386,7 +386,7 @@ module Vlasov_module
 
     !> Computes the position-wise marginal distribution.
     !!
-    !! \f$ \rho_i = \int_{-v_{max}}^{v_{max}} f(x,v) dv
+    !! \f$ \rho_i = \int_{-v_{max}}^{v_{max}} f(x,v) dv \f$
     !! @param this A type(grid) variable.
     subroutine compute_rho(this)
       type(grid), intent(inout) :: this
@@ -402,7 +402,7 @@ module Vlasov_module
 
     !> Computes the velocity-wise marginal distribution.
     !!
-    !! \f$ \phi_i = \int_{-x_{max}}^{x_{max}} f(x,v) dx
+    !! \f$ \phi_i = \int_{-x_{max}}^{x_{max}} f(x,v) dx \f$
     !! @param this A type(grid) variable.
     subroutine compute_phi(this)
       type(grid), intent(inout) :: this

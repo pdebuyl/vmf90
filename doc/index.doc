@@ -1,8 +1,13 @@
 /*! \mainpage
 
+Copyright (C) 2009-2011 Pierre de Buym
+
 Welcome to the API documentation of vmf90!
 
-The homepage of vmf90 is found at <a href="http://homepages.ulb.ac.be/~pdebuyl/vmf90/">http://homepages.ulb.ac.be/~pdebuyl/vmf90/</a>.
+vmf90 is a package to perform simulations of the Vlasov equation for mean-field systems.
 
+vmf90 is written and developed by Pierre de Buyl.
+
+The homepage of vmf90 is found at <a href="http://homepages.ulb.ac.be/~pdebuyl/vmf90/">http://homepages.ulb.ac.be/~pdebuyl/vmf90/</a>.
 
 */
