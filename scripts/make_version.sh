@@ -1,7 +1,7 @@
 #!/bin/bash
 # Check if the working directory is clean.
 GIT_STATUS="Unclean"
-echo $GIT_STATUS | grep -q "working directory clean" && GIT_STATUS="Clean"
+git status | grep -q "working directory clean" && GIT_STATUS="Clean"
 # Take the original file and set git_status
 sed -e "s/GIT_STATUS/${GIT_STATUS}/g" ../src/vmf90_version.h.in > vmf90_version.h.temp
 # Set git_sha1
