@@ -1,5 +1,5 @@
-vmf90 : Vlasov solver for mean-fied systems in Fortran 90
-=========================================================
+vmf90 : Vlasov solver for mean-field systems in Fortran 90
+==========================================================
 
 Copyright © 2009-2011 Pierre de Buyl
 
