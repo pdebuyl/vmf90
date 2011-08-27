@@ -3,6 +3,8 @@
 *.mod
 .DS_Store?
 
+/src/runHMF
+/src/vmf90_version.h
 /build
 /dist
 /doc/html
