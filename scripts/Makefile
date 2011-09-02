@@ -32,7 +32,11 @@ vmf90.o: vmf90.f90 vmf90_version.h
 runHMF: spline_module.o Vlasov_module.o HMF_module.o ParseText.o vmf90_version.h vmf90.o runHMF.o
 	$(F90) spline_module.o Vlasov_module.o HMF_module.o ParseText.o vmf90.o runHMF.o -o runHMF
 
+runFEL: spline_module.o Vlasov_module.o FEL_module.o ParseText.o vmf90_version.h vmf90.o runFEL.o
+	$(F90) spline_module.o Vlasov_module.o FEL_module.o ParseText.o vmf90.o runFEL.o -o runFEL
+
 clean:
 	rm -f spline_module.o Vlasov_module.o HMF_module.o ParseText.o vmf90.o runHMF.o \
-	spline_module.mod Vlasov_module.mod HMF_module.mod ParseText.mod vmf90.mod runHMF.mod \
-	vmf90_version.h runHMF
+	spline_module.mod vlasov_module.mod hmf_module.mod parsetext.mod vmf90.mod \
+	FEL_module.o fel_module.mod \
+	vmf90_version.h runHMF runFEL

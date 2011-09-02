@@ -1,20 +1,76 @@
+! Copyright (C) 2009-2011 Pierre de Buyl
+
+! This file is part of vmf90
+
+! vmf90 is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+
+! vmf90 is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+! GNU General Public License for more details.
+
+! You should have received a copy of the GNU General Public License
+! along with vmf90.  If not, see <http://www.gnu.org/licenses/>.
+
+!> This module defines a Vlasov setup for the Colson-Bonifacio model for the free electron
+!! laser.
+!!
+!! Routines are provided to compute the force field and the thermodynamical observables.
+!!
+!! The Vlasov equation for this model has been introduced in
+!! XXX
+!!
+!! Results of Vlasov simulations for this model are found in
+!! XXX
+!!
+
 module FEL_module
   use Vlasov_module
   implicit none
 
-!  double precision, parameter :: PI = 3.141592653589793115997963468544185161590576171875 !atan(1.d0)*4.d0
-
+  !> This type holds the data to describe a HMF system.
   type FEL
+     !> The grid holding the distribution function.
      type(grid) :: V
-     double precision :: I, phi
-     double precision :: Mx, My
+     !> The intensity of the field.
+     double precision :: I
+     !> The phase of the field.
+     double precision :: phi
+     !> The x component of the instantaneous magnetization.
+     double precision :: Mx
+     !> The y component of the instantaneous magnetization.
+     double precision :: My
+     !> The detuning.
      double precision :: delta
-     double precision :: sommesin, sommecos
-     double precision :: Ax(4), Ay(4), Bx(4), By(4)
+     !> The height of the waterbag.
+     double precision :: f0
+     !> The x component of the field. Ax(1) is the present step and the three other components
+     !! are previous steps for the predictor-corrector algorithm.
+     double precision :: Ax(4)
+     !> The y component of the field. Ay(1) is the present step and the three other components
+     !! are previous steps for the predictor-corrector algorithm.
+     double precision :: Ay(4)
+     !> The y component of the field derivative. Bx(1) is the present step and the three
+     !! other components are previous steps for the predictor-corrector algorithm.
+     double precision :: Bx(4)
+     !> The y component of the field derivative. By(1) is the present step and the three
+     !! other components are previous steps for the predictor-corrector algorithm.
+     double precision :: By(4)
   end type FEL
   
 contains
   
+  !> Initializes a FEL variable.
+  !!
+  !! @param this A type(FEL) variable.
+  !! @param Nx The number of grid points in the x direction.
+  !! @param Nv The number of grid points in the v direction.
+  !! @param vmax Upper bound of the box in velocity.
+  !! @param vmin Lower bound of the box in velocity.
+  !! @param delta Detuning.
   subroutine newFEL(this,Nx,Nv,vmax,vmin, delta)
     type(FEL), intent(out) :: this
     integer, intent(in) :: Nx, Nv
@@ -42,6 +98,9 @@ contains
 
   end subroutine newFEL
   
+  !> Computes the magnetization.
+  !!
+  !! @param this A type(HMF) variable.
   subroutine compute_M(this)
     type(FEL), intent(inout) :: this
 
@@ -52,25 +111,15 @@ contains
        this%Mx = this%Mx + cos(get_x(this%V,i)) * this%V%rho(i)
        this%My = this%My + sin(get_x(this%V,i)) * this%V%rho(i)
     end do
-!    this%Mx = this%Mx - 0.5d0 * (cos(get_x(this%V,1))*this%V%rho(1) + cos(get_x(this%V,this%V%Nx))*this%V%rho(this%V%Nx))
-!    this%My = this%My - 0.5d0 * (sin(get_x(this%V,1))*this%V%rho(1) + sin(get_x(this%V,this%V%Nx))*this%V%rho(this%V%Nx))
 
     this%Mx = this%Mx * this%V%dx
     this%My = this%My * this%V%dx
 
   end subroutine compute_M
 
-  subroutine compute_force(this)
-    type(FEL), intent(inout) :: this
-    
-    integer :: i
-
-    do i=1,this%V%Nx
-       this%V%force(i) = - 2.d0 * sqrt(this%I)*(cos(get_x(this%V,i)-this%phi))
-    end do
-    
-  end subroutine compute_force
-
+  !> Computes the force field.
+  !!
+  !! @param this A type(HMF) variable.
   subroutine compute_force_A(this)
     type(FEL), intent(inout) :: this
 
@@ -81,6 +130,9 @@ contains
     end do
   end subroutine compute_force_A
 
+  !> Predictor step for A.
+  !!
+  !! @param this A type(HMF) variable.
   subroutine compute_A(this)
     type(FEL), intent(inout) :: this
 
@@ -102,6 +154,9 @@ contains
 
   end subroutine compute_A
 
+  !> Corrector step for A.
+  !!
+  !! @param this A type(HMF) variable.
   subroutine correct_A(this)
     type(FEL), intent(inout) :: this
 
@@ -112,21 +167,49 @@ contains
     this%Ay(1) = this%Ay(2) + this%V%DT/12.d0 * (5.d0*this%By(1) + 8.d0*this%By(2) - 1.d0*this%By(3))
 
   end subroutine correct_A
-  
-  subroutine c_somme(this)
-    type(FEL), intent(inout) :: this
-    
-    integer :: i
 
-    this%sommesin = 0.d0
-    this%sommecos = 0.d0
+  !> Computes the macroscopic observables.
+  !!
+  !! @param this A type(FEL) variable.
+  !! @param phys An array holding the observables.
+  !! @param time The real-valued time. Is inserted with the observables in phys.
+  subroutine compute_phys(this, phys, time)
+    type(FEL), intent(inout) :: this
+    double precision, intent(out) :: phys(:)
+    double precision, intent(in) :: time
+
+    integer :: i,m
+    double precision :: masse, L2, entropy, loopf
+
+    masse = sum(this%V%rho)*this%V%dx
+    this%V%en_int = 2.d0*(this%Ax(1)*this%My + this%Ay(1)*this%Mx)
+    this%V%en_kin = 0.d0
+    this%V%momentum = 0.d0
+    entropy=0.d0
+    L2=0.d0
     do i=1,this%V%Nx
-       this%sommesin = this%sommesin + sin(get_x(this%V,i)-this%phi)*this%V%rho(i)
-       this%sommecos = this%sommecos + cos(get_x(this%V,i)-this%phi)*this%V%rho(i)
+       do m=1,this%V%Nv
+          loopf = this%V%f(i,m)
+          this%V%en_kin = this%V%en_kin + get_v(this%V,m)**2 * loopf
+          this%V%momentum = this%V%momentum + get_v(this%V,m) * loopf
+          L2 = L2+loopf**2
+          loopf=loopf/this%f0
+          if (loopf.gt.0.d0) then
+             entropy = entropy + loopf*log(loopf)
+          end if
+          if (loopf.lt.1.d0) then
+             entropy = entropy + (1.d0-loopf)*log(1.d0-loopf)
+          end if
+       end do
     end do
-    this%sommesin = this%sommesin * this%V%dx
-    this%sommecos = this%sommecos * this%V%dx
-    
-  end subroutine c_somme
+    this%V%en_kin = this%V%en_kin * 0.5d0 * this%V%dx * this%V%dv
+    this%V%momentum = this%V%momentum     * this%V%dx * this%V%dv
+    entropy = -entropy              * this%V%dx * this%V%dv
+    L2           = L2               * this%V%dx * this%V%dv
+    this%V%energie = this%V%en_int + this%V%en_kin
+
+    phys = (/time, masse, this%V%energie, this%V%en_int, this%V%en_kin,this%V%momentum, this%I, this%phi, entropy, this%Ax(1), this%Ay(1), L2/)
+
+  end subroutine compute_phys
 
 end module FEL_module

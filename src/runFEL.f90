@@ -1,6 +1,26 @@
+! Copyright (C) 2009-2011 Pierre de Buyl
+
+! This file is part of vmf90
+
+! vmf90 is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+
+! vmf90 is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+! GNU General Public License for more details.
+
+! You should have received a copy of the GNU General Public License
+! along with vmf90.  If not, see <http://www.gnu.org/licenses/>.
+
+!> This program runs a Vlasov simulation of the Colson-Bonifacio model for the free electron
+!! laser. It makes use of the vmf90 code.
 program runFEL
   use FEL_module
   use ParseText
+  use vmf90
   implicit none
   
   type(FEL) :: F
@@ -13,22 +33,19 @@ program runFEL
   integer :: i,m,t,t_top, n_images, t_images
   integer :: n_steps, n_top
   
-  double precision :: masse, entropy, loopf, fzero, temp, L2
   integer, parameter :: time_number = 12
   double precision :: vals(time_number)
   character(len=12) :: time_names(time_number), IC
   
-! declaration for the routines allowing the inversion of m = m(width)
-  external zbrent, ftbz
-  double precision zbrent
+! Parse config file and create HMF and datafile data
 
   call PTparse(HCF,'FEL_in',7)
   Nx = PTread_i(HCF,'Nx')
   Nv = PTread_i(HCF,'Nv')
   vmax = PTread_d(HCF,'vmax')
   vmin = PTread_d(HCF,'vmin')
-  n_steps = PTread_i(HCF,'n_steps')  !100
-  n_top = PTread_i(HCF,'n_top')      !100
+  n_steps = PTread_i(HCF,'n_steps')
+  n_top = PTread_i(HCF,'n_top')
   DT = PTread_d(HCF,'DT')
   IC = PTread_s(HCF, 'IC')
   n_images = PTread_i(HCF, 'n_images')
@@ -39,42 +56,24 @@ program runFEL
   F%phi = 0.d0
   F%I = 0.0001d0
   
-
+  call vmf90_info()
   write(*,*) 'launching FEL with ', Nx, 'x', Nv,  'points'
   F%Ax = 0.0001d0;
   F%Ay = 0.d0;
+
+! Handle initial condition
 
   if (IC.eq.'waterbag') then
      width = PTread_d(HCF, 'width')
      bag = PTread_d(HCF, 'bag')
      call init_carre(F%V, width, bag)
-     fzero = .25d0/(width*bag)
+     F%f0 = .25d0/(width*bag)
   else if (IC.eq.'wb_p0') then
      width = PTread_d(HCF, 'width')
      bag = PTread_d(HCF, 'bag')
      p0 = PTread_d(HCF, 'p0')
      call init_carre(F%V, width, bag, p0 = p0)
-     fzero = .25d0/(width*bag)
-  else if (IC.eq.'wb_b0') then
-     width = zbrent(ftbz, 1d-8,4.d0*atan(1.d0), PTread_d(HCF,'b0'),1d-6)
-     bag = sqrt(6.d0*PTread_d(HCF,'e0'))
-     fzero = .25d0/(width*bag)
-     call init_carre(F%V, width, bag)
-  else if (IC.eq.'LB') then
-     x1 = PTread_d(HCF, 'x1')
-     x2 = PTread_d(HCF, 'x2')
-     x3 = PTread_d(HCF, 'x3')
-     fzero = PTread_d(HCF, 'f0')
-     do i=1,F%V%Nx
-        do m=1,F%V%Nv
-           temp = x3*exp(-x2 * (.5d0*get_v(F%V,m)**2 + 2.d0*x1*sin(get_x(F%V,i)) + x1**2*get_v(F%V,m) + 0.5d0*x1**4) )
-           F%V%f(i,m) = fzero*temp/(1+temp)
-        end do
-     end do
-     F%I = x1
-     if (x1.lt.1.d-8) then
-        F%I=0.00001d0
-     end if
+     F%f0 = .25d0/(width*bag)
   else
      stop 'unknown IC'
   end if
@@ -92,34 +91,8 @@ program runFEL
 
   call compute_rho(F%V)
   call compute_M(F)
-  masse = sum(F%V%rho)*F%V%dx
-  F%V%en_int = 2.d0*(F%Ax(1)*F%My + F%Ay(1)*F%Mx)
-  F%V%en_kin = 0.d0
-  F%V%momentum = 0.d0
-  entropy=0.d0
-  L2=0.d0
-  do i=1,F%V%Nx
-     do m=1,F%V%Nv
-        loopf = F%V%f(i,m)
-        F%V%en_kin = F%V%en_kin + get_v(F%V,m)**2 * loopf
-        F%V%momentum = F%V%momentum + get_v(F%V,m) * loopf
-        L2 = L2+loopf**2
-        loopf=loopf/fzero
-        if (loopf.gt.0.d0) then
-           entropy = entropy + loopf*log(loopf)
-        end if
-        if (loopf.lt.1.d0) then
-           entropy = entropy + (1.d0-loopf)*log(1.d0-loopf)
-        end if
-     end do
-  end do
-  F%V%en_kin = F%V%en_kin * 0.5d0 * F%V%dx * F%V%dv
-  F%V%momentum = F%V%momentum     * F%V%dx * F%V%dv
-  entropy = -entropy              * F%V%dx * F%V%dv
-  L2           = L2               * F%V%dx * F%V%dv
-  F%V%energie = F%V%en_int + F%V%en_kin
+  call compute_phys(F, vals, t_top*DT)
   call write_data_group_h5(h5fel, F%V, 0)
-  vals = (/t_top*DT, masse, F%V%energie, F%V%en_int, F%V%en_kin,F%V%momentum, F%I, F%phi, entropy, F%Ax(1), F%Ay(1), L2/)
   call write_time_slice_h5(h5fel, t_top, vals)
 
 
@@ -175,33 +148,7 @@ program runFEL
      F%I = F%Ax(1)**2+F%Ay(1)**2
      F%phi = atan2(F%Ay(1),F%Ax(1))
 
-     masse = sum(F%V%rho)*F%V%dx
-     F%V%en_int = 2.d0*(F%Ax(1)*F%My + F%Ay(1)*F%Mx)
-     F%V%en_kin = 0.d0
-     F%V%momentum = 0.d0
-     entropy=0.d0
-     L2=0.d0
-     do i=1,F%V%Nx
-        do m=1,F%V%Nv
-           loopf = F%V%f(i,m)
-           F%V%en_kin = F%V%en_kin + get_v(F%V,m)**2 * loopf
-           F%V%momentum = F%V%momentum + get_v(F%V,m) * loopf
-           L2=L2+loopf**2
-           loopf=loopf/fzero
-           if (loopf.gt.0.d0) then
-              entropy = entropy + loopf*log(loopf)
-           end if
-           if (loopf.lt.1.d0) then
-              entropy = entropy + (1.d0-loopf)*log(1.d0-loopf)
-           end if
-        end do
-     end do
-     F%V%en_kin = F%V%en_kin * 0.5d0 * F%V%dx * F%V%dv
-     F%V%momentum = F%V%momentum     * F%V%dx * F%V%dv
-     entropy = -entropy              * F%V%dx * F%V%dv
-     L2      =  L2                   * F%V%dx * F%V%dv
-     F%V%energie = F%V%en_int + F%V%en_kin
-     vals = (/t_top*n_steps*DT, masse, F%V%energie, F%V%en_int, F%V%en_kin,F%V%momentum, F%I, F%phi, entropy, F%Ax(1), F%Ay(1), L2/)
+     call compute_phys(F, vals, t_top*DT)
      call write_time_slice_h5(h5fel, t_top, vals)
 
      if (t_top*n_images/n_top.ge.t_images) then
@@ -211,16 +158,6 @@ program runFEL
      
   end do
 
-
-
   call close_h5(h5fel)
 
 end program runFEL
-
-function ftbz(s_theta,bunching)
-  implicit none
-  double precision s_theta, bunching, ftbz
-
-  ftbz = sin(s_theta)/s_theta - bunching
-
-end function ftbz
