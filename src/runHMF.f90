@@ -15,6 +15,8 @@
 ! You should have received a copy of the GNU General Public License
 ! along with vmf90.  If not, see <http://www.gnu.org/licenses/>.
 
+!> This program runs a Vlasov simulation of the Hamiltonian Mean-Field model, using
+!! the vmf90 code.
 program runHMF
   use HMF_module
   use ParseText
