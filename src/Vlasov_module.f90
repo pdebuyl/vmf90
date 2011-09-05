@@ -670,7 +670,7 @@ module Vlasov_module
       character(len=64) :: datastring
       integer(HID_T) :: DSP_id, DSET_id, STR_T
       integer(HSIZE_T) :: dims(1)
-      integer(HSIZE_T) :: l
+      integer(SIZE_T) :: l
       dims(1) = 1
       
       write(formatstring, '(a5,i2.2,a1)') "(a5,a", len(info_name), ")"
@@ -697,7 +697,7 @@ module Vlasov_module
       character(len=64) :: datastring
       integer(HID_T) :: DSP_id, DSET_id, STR_T
       integer(HSIZE_T) :: dims(1)
-      integer(HSIZE_T) :: l
+      integer(SIZE_T) :: l
       dims(1) = size(info_element)
       
       write(formatstring, '(a5,i2.2,a1)') "(a5,a", len(info_name), ")"
