@@ -91,7 +91,7 @@ program runFEL
 
   call compute_rho(F%V)
   call compute_M(F)
-  call compute_phys(F, vals, t_top*DT)
+  call compute_phys(F, vals, t_top*n_steps*DT)
   call write_data_group_h5(h5fel, F%V, 0)
   call write_time_slice_h5(h5fel, t_top, vals)
 
@@ -148,7 +148,7 @@ program runFEL
      F%I = F%Ax(1)**2+F%Ay(1)**2
      F%phi = atan2(F%Ay(1),F%Ax(1))
 
-     call compute_phys(F, vals, t_top*DT)
+     call compute_phys(F, vals, t_top*n_steps*DT)
      call write_time_slice_h5(h5fel, t_top, vals)
 
      if (t_top*n_images/n_top.ge.t_images) then
