@@ -1,0 +1,13 @@
+out_file = fel.h5            ! filename for output data
+Nx = 256                     ! number of points in x-direction
+Nv = 384                     ! number of points in v-direction
+vmin = -4.                   ! upper limit of the box in the v-direction
+vmax = 3.                    ! lower limit of the box in the v-direction
+DT = 0.005                   ! timestep
+n_steps = 20                 ! number of steps in inner loop
+n_top = 600                  ! number of executions for inner loop
+n_images = 20                ! number of dumps of the phase space DF
+delta = 0.0                  ! detuning
+IC = waterbag                ! initial condition
+width = 3.1416               ! \Delta\theta for initial condition
+bag = 1.0954451150103324     ! \Delta p for initial condition

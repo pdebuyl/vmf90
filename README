@@ -43,7 +43,11 @@ Usage
 
 5. The build directory now contains an executable ``vmf90_hmf``.
 6. A ``HMF_in`` configuration file is required to set up the
-   simulation. Examples are found in the ``examples`` directory.
+   simulation. Examples are found in the ``examples`` directory. To copy one of
+   these examples, type ::
+
+    cp ../scripts/HMF_in.resonances ./HMF_in
+
 7. A run is performed by executing ``vmf90_hmf`` ::
 
     ./vmf90_hmf
@@ -63,7 +67,8 @@ A doxygen-generated documentation is readily available by executing ::
 
     doxygen doc/doxy_conf
 
-from the main directory of vmf90.
+from the main directory of vmf90. The index of the documentation is found at
+``doc/html/index.html``.
 
 This README file is reStructuredText and can be converted to html, for instance,
 with the rst2html command-line tool ::

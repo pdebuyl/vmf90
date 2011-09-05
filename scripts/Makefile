@@ -15,7 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with vmf90.  If not, see <http://www.gnu.org/licenses/>.
 
-F90 = h5fc -O3
+F90 = h5fc -O3 -I.
+# for gfortran, add "-ffree-line-length-none" to the line above.
 VPATH = ../src
 all : hmf fel
 hmf: vmf90_hmf
