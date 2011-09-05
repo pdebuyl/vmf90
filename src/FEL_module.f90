@@ -21,10 +21,12 @@
 !! Routines are provided to compute the force field and the thermodynamical observables.
 !!
 !! The Vlasov equation for this model has been introduced in
-!! XXX
+!! J. Barré, T. Dauxois, G. De Ninno, D. Fanelli and S. Ruffo, Statistical theory of high-gain
+!! free-electron laser saturation, Phys. Rev. E vol. 69, 045501 (2004).
 !!
 !! Results of Vlasov simulations for this model are found in
-!! XXX
+!! P. de Buyl, D. Fanelli, R. Bachelard and G. De Ninno, Out-of-equilibrium mean-field dynamics
+!! of a model for wave-particle interaction, Phys. Rev. ST Accel. Beams vol. 12, 060704 (2009).
 !!
 
 module FEL_module
