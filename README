@@ -4,15 +4,14 @@ vmf90 : Vlasov solver for mean-field systems in Fortran 90
 Copyright © 2009-2011 Pierre de Buyl
 
 vmf90 is a software for the numerical resolution of the Vlasov equation for 
-mean-field systems, such as the Hamiltonian Mean-Field model. vmf90 is based
+mean-field systems, currently the Hamiltonian Mean-Field model and the
+Colson-Bonifacio model for the free electron laser. vmf90 is based
 on the semi-Lagrangian method with cubic spline interpolation.
 
 vmf90 is developed by Pierre de Buyl and is available under the `GNU General 
 Public License <http://www.gnu.org/licenses/gpl.html>`_. The GNU General Public
 License is found in the file LICENSE. The homepage for vmf90 is
 `<http://homepages.ulb.ac.be/~pdebuyl/vmf90/>`_.
-
-At this time, the vmf90 program is available only for the HMF model.
 
 Requirements
 ------------
@@ -30,18 +29,32 @@ To analyze the data, Python example scripts are provided. They require
 Usage
 -----
 
-1. Make sure that the ``h5fc`` Fortran compiler script for HDF5 is properly set up.
-2. run the make command with the HMF argument ::
+1. Make sure that the ``h5fc`` Fortran compiler script for HDF5 is properly set
+   up.
+2. Create a build directory and copy the Makefile ::
 
-    make HMF
+    mkdir build && cd build
+    cp ../scripts/Makefile ./
 
+3. Eventually, edit the ``Makefile`` to adapt to your compiler.
+4. Run the make command with the argument ``hmf`` ::
 
-3. The build directory now contains an executable runHMF.
-4. A ``HMF_in`` configuration file is required to set up the
+    make hmf
+
+5. The build directory now contains an executable ``vmf90_hmf``.
+6. A ``HMF_in`` configuration file is required to set up the
    simulation. Examples are found in the ``examples`` directory.
-5. After a run is completed, the data is found in the file ``hmf.h5``. Examples
+7. A run is performed by executing ``vmf90_hmf`` ::
+
+    ./vmf90_hmf
+
+8. After a run is completed, the data is found in the file ``hmf.h5``. Examples
    scripts on how to read these files in Python are found in the ``scripts``
-   directory.
+   directory. To display the total energy and the interaction and kinetic parts,
+   issue the following command (NumPy, h5py and Matplotlib are required) ::
+
+    ../scripts/show_vmf90.py hmf.h5 plot energy int kin
+
 
 Documentation
 -------------
@@ -58,7 +71,7 @@ with the rst2html command-line tool ::
     rst2html README > README.html
 
 Appropriate references to the algorithms are given in the documentation, as well
-a full API documentation for the code and the Fortran modules.
+as a full API documentation for the code and the Fortran modules.
 
 Appropriate citation is appreciated in any scientific publication that makes use
 of this software. The latest citation suggestion is ::

@@ -17,7 +17,9 @@
 
 F90 = h5fc -O3
 VPATH = ../src
-all : runHMF
+all : hmf fel
+hmf: vmf90_hmf
+fel: vmf90_fel
 
 vmf90_version.h: vmf90_version.h.in FORCE    # TOREMOVE
 	../scripts/make_version.sh           # TOREMOVE
@@ -29,14 +31,14 @@ vmf90.o: vmf90.f90 vmf90_version.h
 %.o : %.f90
 	$(F90) -c $<
 
-runHMF: spline_module.o Vlasov_module.o HMF_module.o ParseText.o vmf90_version.h vmf90.o runHMF.o
-	$(F90) spline_module.o Vlasov_module.o HMF_module.o ParseText.o vmf90.o runHMF.o -o runHMF
+vmf90_hmf: spline_module.o Vlasov_module.o HMF_module.o ParseText.o vmf90_version.h vmf90.o vmf90_hmf.o
+	$(F90) spline_module.o Vlasov_module.o HMF_module.o ParseText.o vmf90.o vmf90_hmf.o -o vmf90_hmf
 
-runFEL: spline_module.o Vlasov_module.o FEL_module.o ParseText.o vmf90_version.h vmf90.o runFEL.o
-	$(F90) spline_module.o Vlasov_module.o FEL_module.o ParseText.o vmf90.o runFEL.o -o runFEL
+vmf90_fel: spline_module.o Vlasov_module.o FEL_module.o ParseText.o vmf90_version.h vmf90.o vmf90_fel.o
+	$(F90) spline_module.o Vlasov_module.o FEL_module.o ParseText.o vmf90.o vmf90_fel.o -o vmf90_fel
 
 clean:
-	rm -f spline_module.o Vlasov_module.o HMF_module.o ParseText.o vmf90.o runHMF.o \
+	rm -f spline_module.o Vlasov_module.o HMF_module.o ParseText.o vmf90.o vmf90_hmf.o vmf90_fel.o \
 	spline_module.mod vlasov_module.mod hmf_module.mod parsetext.mod vmf90.mod \
 	FEL_module.o fel_module.mod \
-	vmf90_version.h runHMF runFEL
+	vmf90_version.h vmf90_hmf vmf90_fel
