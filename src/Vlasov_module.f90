@@ -50,7 +50,6 @@ module Vlasov_module
      logical :: is_periodic
 
      double precision, allocatable :: f(:,:)
-     double precision, allocatable :: xval(:), vval(:)
      double precision, allocatable :: f2(:,:), g(:,:)
      double precision, allocatable :: rho(:), phi(:), force(:)
   end type grid
@@ -139,11 +138,6 @@ module Vlasov_module
          this%dx = (this%xmax-this%xmin)/dble(Nx-1)
          this%dv = (this%vmax-this%vmin)/dble(Nv-1)
       end if      
-
-      allocate(this%xval(Nx))
-      allocate(this%vval(Nv))
-      this%xval = (/ (this%xmin + (i-1)*this%dx, i=1, this%Nx) /)
-      this%vval = (/ (this%vmin + (m-1)*this%dv, m=1, this%Nv) /)
 
     end subroutine new
 
@@ -374,7 +368,7 @@ module Vlasov_module
 
       do i=1,this%Nx
          do m=1,this%Nv
-            write(unit, '(3e20.10e3)') this%xval(i), this%vval(m), this%f(i,m)
+            write(unit, '(3e20.10e3)') get_x(this,i), get_v(this,m), this%f(i,m)
          end do
          write(unit, *) ''
       end do
