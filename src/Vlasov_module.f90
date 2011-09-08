@@ -53,7 +53,6 @@ module Vlasov_module
      double precision, allocatable :: xval(:), vval(:)
      double precision, allocatable :: f2(:,:), g(:,:)
      double precision, allocatable :: rho(:), phi(:), force(:)
-     double precision, allocatable :: ux(:), uv(:)
   end type grid
 
   !> The type datafile_h5 is used to store HDF5 variables for a Vlasov simulation.
@@ -119,8 +118,6 @@ module Vlasov_module
       allocate(this%rho(Nx))
       allocate(this%force(Nx))
       allocate(this%phi(Nv))
-      allocate(this%ux(Nx-1))
-      allocate(this%uv(Nv-1))
 
       this%xmax=xmax
       this%vmax=vmax
