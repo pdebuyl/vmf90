@@ -283,7 +283,7 @@ module Vlasov_module
       double precision, intent(in) :: v
       integer, intent(in) :: i
 
-      if (v.lt.this%vmin .or. v.ge.this%vmax) then
+      if (v-this% vmin.le.0.d0 .or. v-this%vmin.ge.this%vmax-this%vmin) then
          splint_v = 0.d0
          return
       end if
