@@ -48,6 +48,16 @@ module AB_module
   end type AB
 
 contains
+
+  !> Initializes a AB variable.
+  !!
+  !! @param this A type(AB) variable.
+  !! @param NAx The number of grid points for A in the x direction.
+  !! @param NAv The number of grid points for A in the v direction.
+  !! @param NBx The number of grid points for B in the x direction.
+  !! @param NBv The number of grid points for B in the v direction.
+  !! @param vmax Upper bound of the box in velocity.
+  !! @param vmin Lower bound of the box in velocity.
   subroutine newAB(this, NAx, NAv, NBx, NBv, vmax, vmin)
     type(AB), intent(out) :: this
     integer, intent(in) :: NAx, NAv, NBx, NBv
@@ -66,6 +76,12 @@ contains
     call new(this%B, NBx, NBv, PI, vmax, vmin=vmin_final, is_periodic=.true.)
   end subroutine newAB
 
+  !> Creates a datafile for the AB model.
+  !! @param this A datafile_h5 variable.
+  !! @param thisAB The AB variable.
+  !! @param filename The filename.
+  !! @param ntime The number of time variables.
+  !! @param nvals The number of timesteps for the time variables.
   subroutine create_AB_h5(this, thisAB, filename, ntime, nvals)
     type(datafile_h5), intent(out) :: this
     type(AB), intent(in) :: thisAB
@@ -96,6 +112,9 @@ contains
     call h5screate_simple_f(1, ts_one_dims, this%ts_s_id, this%error)
 
   end subroutine create_AB_h5
+
+  !> Closes a datafile for the AB model.
+  !! @param this A datafile_h5 variable.
   subroutine close_AB_h5(this)
     type(datafile_h5), intent(inout) :: this
     
@@ -112,6 +131,9 @@ contains
     call h5close_f(this%error)
   end subroutine close_AB_h5
 
+  !> Computes the magnetization.
+  !!
+  !! @param this A type(AB) variable.
   subroutine compute_M(this)
     type(AB), intent(inout) :: this
 
@@ -138,6 +160,9 @@ contains
 
   end subroutine compute_M
 
+  !> Computes the force field.
+  !!
+  !! @param this A type(HMF) variable.
   subroutine compute_force(this)
     type(AB), intent(inout) :: this
 
@@ -152,6 +177,11 @@ contains
 
   end subroutine compute_force
 
+  !> Computes the macroscopic observables.
+  !!
+  !! @param this A type(HMF) variable.
+  !! @param phys An array holding the observables.
+  !! @param time The real-valued time. Is inserted with the observables in phys.
   subroutine compute_phys(this, phys, time)
     type(AB), intent(inout) :: this
     double precision, intent(out) :: phys(:)
