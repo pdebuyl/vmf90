@@ -24,11 +24,27 @@ module AB_module
   use Vlasov_module
   implicit none
 
+  !> This type holds the data to describe a HMF system.
   type AB
-     type(grid) :: A,B
+     !> The grid holding the distribution function, subsystem A.
+     type(grid) :: A
+     !> The grid holding the distribution function, subsystem B.
+     type(grid) :: B
+     !> The splitting parameter. gamma=0 means only A contributes to the magnetization,
+     !! gamma=1 means only B contributes to the magnetization.
      double precision :: gamma
-     double precision :: MAx, MAy, MBx, MBy, Mx, My
-     double precision :: fA0, fB0
+     !> Magnetization for the A subsystem, component x.
+     double precision :: MAx
+     !> Magnetization for the A subsystem, component y.
+     double precision :: MAy
+     !> Magnetization for the B subsystem, component x.
+     double precision :: MBx
+     !> Magnetization for the B subsystem, component y.
+     double precision :: MBy
+     !> Total magnetization, M = (1-gamma)*MA + gamma*MB, component x.
+     double precision :: Mx
+     !> Total magnetization, M = (1-gamma)*MA + gamma*MB, component y.
+     double precision :: My
   end type AB
 
 contains
