@@ -1,6 +1,7 @@
 program runAB
   use AB_module
   use ParseText
+  use vmf90
   implicit none
 
   type(AB) :: H
@@ -35,6 +36,8 @@ program runAB
   call write_info_string_array_h5(h5AB, 'time_names', time_names)
 
   call write_info_double_h5(h5AB, 'gamma', H%gamma)
+
+  call vmf90_info()
 
   IC = PTread_s(HCF, 'ICA')
   if (IC.eq.'wb') then
