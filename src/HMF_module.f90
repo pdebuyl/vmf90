@@ -100,8 +100,16 @@ contains
     if (present(model)) then
        if (model.eq.'HMFext') then
           this%is_ext = .true.
-          this%epsilon = epsilon
-          this%Hfield = Hfield
+          if (present(epsilon)) then
+             this%epsilon = epsilon
+          else
+             this%epsilon = 1.d0
+          end if
+          if (present(Hfield)) then
+             this%Hfield = Hfield
+          else
+             this%Hfield = 0.d0
+          end if
        else
           this%is_ext = .false.
           this%epsilon = 1.d0
