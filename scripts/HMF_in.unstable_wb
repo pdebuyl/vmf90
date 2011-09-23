@@ -12,3 +12,4 @@ width = 4.                   ! \Delta\theta for initial condition
 bag = 0.7                    ! \Delta p for initial condition
 epsilon = 0.001              ! initial perturbation of the profile
 Nedf = 0                     ! number of points for energy DF
+Hfield = 0.                  ! External field in case of HMFext model

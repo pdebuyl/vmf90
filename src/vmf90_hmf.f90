@@ -57,7 +57,7 @@ program runHMF
   n_images = PTread_i(HCF, 'n_images')
   t_images = 1
 
-  call newHMF(H,Nx,Nv,vmax, Nedf=PTread_i(HCF,'Nedf'), model=PTread_s(HCF, 'model') )
+  call newHMF(H,Nx,Nv,vmax, Nedf=PTread_i(HCF,'Nedf'), model=PTread_s(HCF, 'model'), Hfield=PTread_d(HCF,'Hfield') )
   H%V%DT = DT
   call create_h5(h5hmf, H%V, PTread_s(HCF, 'out_file'), n_top, time_number)
 
