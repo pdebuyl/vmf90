@@ -511,6 +511,38 @@ module Vlasov_module
       this%f = this%f / norme
          
     end subroutine init_gaussian
+
+    !> Initializes the distribution function with an homogeneous square Lorentzian distribution.
+    !!
+    !! The shape of this distribution is
+    !! \f$ f(v) = \gamma^3 \pi^{-2} \frac{1}{\left( v^2 + \gamma^2 \right)^2} \f$.
+    !!
+    !! An optional perturbation epsilon can be applied.
+    !! @param this A type(grid) variable.
+    !! @param gamma So-called height-parameter.
+    !! @param epsilon The amplitude of the sinusoidal perturbation.
+   subroutine init_squared_lorentzian(this, gamma, epsilon)
+      type(grid), intent(inout) :: this
+      double precision, intent(in) :: gamma
+      double precision, intent(in), optional :: epsilon
+
+      integer :: i,m
+      double precision :: e
+
+      if (present(epsilon)) then
+         e = epsilon
+      else
+         e = 0.d0
+      end if
+
+      do i=1,this%Nx
+         do m=1,this%Nv
+            this%f(i,m) = ( gamma**3/ ( PI**2 * (get_v(this,m)**2+gamma**2)**2 ) ) * &
+                 (1.d0 + e*cos(get_x(this,i)))
+         end do
+      end do
+
+    end subroutine init_squared_lorentzian
     
     subroutine create_h5(this, thisgrid, filename, ntime, nvals)
       type(datafile_h5), intent(out) :: this

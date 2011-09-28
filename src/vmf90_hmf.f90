@@ -100,6 +100,9 @@ program runHMF
      norme = sum(H%V%f(1:H%V%Nx,:))* H%V%dx * H%V%dv
      H%V%f = H%V%f / norme
      write(*,*) sum(H%V%f(1:H%V%Nx,:))*H%V%dx*H%V%dv-1.d0
+  else if (IC.eq.'squared_lorentzian') then
+     call init_squared_lorentzian(H%V, PTread_d(HCF,'lorentz_gamma'), &
+          epsilon=PTread_d(HCF,'lorentz_epsilon'))
   else if (IC.eq.'from_file') then
      call load_data_from_h5(H%V,PTread_s(HCF,'IC_file'),trim(PTread_s(HCF,'IC_position')))
   else
