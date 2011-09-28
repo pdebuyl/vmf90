@@ -278,7 +278,9 @@ contains
           if (index(tempchar,trim(PTin%equalsign)).eq.1) then
              tempchar = adjustl(tempchar)
              tempchar = tempchar(len(trim(PTin%equalsign))+1:)
-             read(tempchar,*) value
+             read(tempchar,'(a)') value
+             value = adjustl(value)
+             value = trim(value(1:index(value,' ')))
              found = .true.
              exit
           end if
