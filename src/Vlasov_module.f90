@@ -483,7 +483,11 @@ module Vlasov_module
 
     !> Initializes the distribution function with an homogeneous gaussian distribution.
     !!
-    !! An optional perturbation epsilon can be applied.
+    !! The function is \f$ f(\theta, v) = \sqrt{\frac{\beta}{2\pi}}
+    !! e^{-\beta \frac{v^2}{2}} \left(1+\epsilon\cos\theta\right) \f$ where
+    !! \f$ \epsilon = 0 \f$ if unspecified. It represents a small pertubation to
+    !! test stability properties.
+    !!
     !! @param this A type(grid) variable.
     !! @param beta The inverse temperature of the distribution.
     !! @param epsilon The amplitude of the sinusoidal perturbation.
@@ -503,7 +507,7 @@ module Vlasov_module
 
       do i=1,this%Nx
          do m=1,this%Nv
-            this%f(i,m) = sqrt(beta/(2.d0*PI)) * exp(-beta * get_v(this,m)**2 /2.d0) * (1.d0 + e*sin(get_x(this,i)))
+            this%f(i,m) = sqrt(beta/(2.d0*PI)) * exp(-beta * get_v(this,m)**2 /2.d0) * (1.d0 + e*cos(get_x(this,i)))
          end do
       end do
 
