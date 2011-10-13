@@ -87,6 +87,11 @@ program runHMF
      epsilon = PTread_d(HCF,'epsilon')
      call init_carre(H%V, width, bag, epsilon=epsilon)
      H%f0 = 1d0/(4*width*bag)
+  else if (IC.eq.'gaussian') then
+     call init_gaussian(H%V, beta=PTread_d(HCF, 'gaussian_beta'))
+  else if (IC.eq.'gaussian_eps') then
+     call init_gaussian(H%V, beta=PTread_d(HCF, 'gaussian_beta'), &
+          epsilon=PTread_d(HCF,'gaussian_epsilon'))
   else if (IC.eq.'fermi_eps') then
      width = PTread_d(HCF, 'beta')
      e0 = PTread_d(HCF, 'a')
