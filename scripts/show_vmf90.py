@@ -21,12 +21,13 @@ from sys import argv
 
 if (len(argv)<3):
   print "Usage : %s show_vmf90.py filename.h5 cmd var1 [var2] [...]" % argv[0]
-  print "        where cmd is plot or snaps and var is expected to be found in the"
-  print "        observables of the file."
+  print "        where cmd is plot, snaps or dump and var is expected to be found in"
+  print "        the observables of the file. dump will output the time series to"
+  print "        standard out."
   exit()
 
 cmd = argv[2]
-if (cmd not in ['plot','snaps']):
+if (cmd not in ['plot','snaps','dump']):
   print "Command %s unknown" % (cmd,)
   exit()
 
@@ -61,6 +62,8 @@ extent = [xmin,xmax,vmin,vmax]
 plt.rc('figure.subplot', left = 0.17)
 f = plt.figure(figsize=[10.,5.2])
 
+do_show = False
+
 if (cmd == 'plot'):
   n_plot = 0
   for var in argv[3:]:
@@ -73,6 +76,7 @@ if (cmd == 'plot'):
 
   if (n_plot>0):
     plt.legend()
+    do_show = True
   else:
     print "available observables: ", a['info/time_names'].value
 
@@ -82,9 +86,23 @@ elif (cmd == 'snaps'):
     plt.imshow(a['data'][names[i*n/3]]['f'],origin='lower',vmin=0.,extent=extent)
     plt.xlabel(r'$x$')
     plt.ylabel(r'$v$')
+  do_show = True
 
+elif (cmd == 'dump'):
+  indices = []
+  for var in argv[3:]:
+    if (var in d):
+      indices.append(d[var])
+    else:
+      print "variable %s not found" % (var,)
+  if (len(indices) > 0):
+    for i in range(t.shape[1]):
+      for j in indices:
+        print "%20.12f " % (t[j,i],) ,
+      print "\n" ,
+  else:
+    print "available observables: ", a['info/time_names'].value
 
 a.close()
 
-plt.show()
-
+if (do_show): plt.show()
