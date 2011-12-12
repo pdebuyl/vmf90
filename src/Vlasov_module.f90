@@ -452,6 +452,46 @@ module Vlasov_module
 
     end subroutine init_carre
 
+    !> Initializes the distribution function f with an self-consistent waterbag distribution.
+    !!
+    !! The waterbag is delimited in velocity by \f$ \sqrt{ 2 \left( y0 + m_x \cos\theta \right) } \f$.
+    !! The optional argument epsilon allows to apply a perturbation in the form \f$ f \propto 1+\epsilon\cos x\f$
+    !! to the distribution.
+    !! @param this A type(grid) variable.
+    !! @param y0 parameter for the self-consistent waterbag distribution.
+    !! @param magnetization Self-consistent value of the magnetization.
+    !! @param epsilon Amplitude of the cosine perturbation.
+    subroutine init_wb_selfc(this, y0, magnetization, epsilon)
+      type(grid), intent(inout) :: this
+      double precision, intent(in) :: y0, magnetization
+      double precision, intent(in), optional :: epsilon
+
+      integer :: i, m
+      double precision :: norme, e, p0var
+
+      if (present(epsilon)) then
+         e = epsilon
+      else
+         e = 0.d0
+      end if
+
+      do i=1,this%Nx
+         do m=1,this%Nv
+            if (abs(get_v(this,m)).le. &
+                 sqrt(2.d0*(y0+magnetization*cos(get_x(this,i)))) &
+                 ) then
+               this%f(i,m) = 1.d0 + e*cos(get_x(this,i))
+            else
+               this%f(i,m) = 0.d0
+            end if
+         end do
+      end do
+
+      norme = sum(this%f(1:this%Nx,:)) * this%dx * this%dv
+      this%f = this%f / norme
+
+    end subroutine init_wb_selfc
+
     subroutine init_two_streams(this, v_min, v_max, width)
       type(grid), intent(inout) :: this
       double precision, intent(in) :: v_min, v_max

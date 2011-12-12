@@ -87,6 +87,8 @@ program runHMF
      epsilon = PTread_d(HCF,'epsilon')
      call init_carre(H%V, width, bag, epsilon=epsilon)
      H%f0 = 1d0/(4*width*bag)
+  else if (IC.eq.'wb_selfc') then
+     call init_wb_selfc(H%V, PTread_d(HCF, 'wb_y0'), PTread_d(HCF, 'wb_mx'))
   else if (IC.eq.'gaussian') then
      call init_gaussian(H%V, beta=PTread_d(HCF, 'gaussian_beta'))
   else if (IC.eq.'gaussian_eps') then
