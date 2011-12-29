@@ -531,13 +531,13 @@ module Vlasov_module
     !! @param this A type(grid) variable.
     !! @param beta The inverse temperature of the distribution.
     !! @param epsilon The amplitude of the sinusoidal perturbation.
-   subroutine init_gaussian(this, beta, epsilon)
+   subroutine init_gaussian(this, beta, epsilon, p0)
       type(grid), intent(inout) :: this
       double precision, intent(in) :: beta
-      double precision, intent(in), optional :: epsilon
+      double precision, intent(in), optional :: epsilon, p0
 
       integer :: i,m
-      double precision :: norme, e
+      double precision :: norme, e, p0var
 
       if (present(epsilon)) then
          e = epsilon
@@ -545,9 +545,15 @@ module Vlasov_module
          e = 0.d0
       end if
 
+      if (present(p0)) then
+         p0var = p0
+      else
+         p0var = 0.d0
+      end if
+
       do i=1,this%Nx
          do m=1,this%Nv
-            this%f(i,m) = sqrt(beta/(2.d0*PI)) * exp(-beta * get_v(this,m)**2 /2.d0) * (1.d0 + e*cos(get_x(this,i)))
+            this%f(i,m) = sqrt(beta/(2.d0*PI)) * exp(-beta * (get_v(this,m)-p0var)**2 /2.d0) * (1.d0 + e*cos(get_x(this,i)))
          end do
       end do
 

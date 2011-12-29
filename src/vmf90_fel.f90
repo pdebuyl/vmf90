@@ -74,6 +74,8 @@ program runFEL
      p0 = PTread_d(HCF, 'p0')
      call init_carre(F%V, width, bag, p0 = p0)
      F%f0 = .25d0/(width*bag)
+  else if (IC.eq.'gaussian_p0') then
+     call init_gaussian(F%V, PTread_d(HCF, 'beta'), p0=PTread_d(HCF,'p0'))
   else
      stop 'unknown IC'
   end if
