@@ -32,7 +32,11 @@ program runAB
 
 
   call create_AB_h5(h5AB, H, 'AB.h5', n_top, time_number)
-  time_names = (/'time', 'masseA', 'masseB', 'energy', 'intAB', 'kinA', 'kinB', 'MAx', 'MAy', 'MBx', 'MBy', 'Mx', 'My', 'dAx', 'dAy', 'dBx', 'dBy', 'pFA', 'pFB' /)
+  time_names = (/'time    ', 'masseA  ', 'masseB  ', 'energy  ', &
+                 'intAB   ', 'kinA    ', 'kinB    ', 'MAx     ', &
+                 'MAy     ', 'MBx     ', 'MBy     ', 'Mx      ', &
+                 'My      ', 'dAx     ', 'dAy     ', 'dBx     ', &
+                 'dBy     ', 'pFA     ', 'pFB     ' /)
   call write_info_string_array_h5(h5AB, 'time_names', time_names)
 
   call write_info_double_h5(h5AB, 'gamma', H%gamma)

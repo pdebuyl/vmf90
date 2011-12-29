@@ -62,7 +62,9 @@ program runHMF
   call create_h5(h5hmf, H%V, PTread_s(HCF, 'out_file'), n_top, time_number)
 
 
-  time_names = (/'time    ', 'mass    ', 'energy  ', 'int     ', 'kin     ', 'momentum', 'Mx      ', 'My      ', 'I2      ', 'I3      ', 'entropy '/)
+  time_names = (/'time    ', 'mass    ', 'energy  ', 'int     ', &
+                 'kin     ', 'momentum', 'Mx      ', 'My      ', &
+                 'I2      ', 'I3      ', 'entropy '/)
   call write_info_string_array_h5(h5hmf, 'time_names', time_names)
 
   call vmf90_info()

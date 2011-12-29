@@ -82,7 +82,9 @@ program runFEL
   call write_grid_info(h5fel, F%V, 'FEL')
   call write_info_double_h5(h5fel,'delta',F%delta)
 
-  time_names = (/'time', 'mass', 'energy', 'int', 'kin', 'momentum', 'I', 'phi', 'entropy','Ax','Ay', 'L2'/)
+  time_names = (/'time    ', 'mass    ', 'energy  ', 'int     ', &
+                 'kin     ', 'momentum', 'I       ', 'phi     ', &
+                 'entropy ', 'Ax      ', 'Ay      ', 'L2      '/)
   call write_info_string_array_h5(h5fel, 'time_names', time_names)
 
   call PTkill(HCF)
