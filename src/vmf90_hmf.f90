@@ -48,6 +48,7 @@ program runHMF
   type(h5md_t) :: mass_ID, energy_ID, int_ID, kin_ID, momentum_ID, Mx_ID, My_ID, I2_ID, I3_ID, entropy_ID
   type(h5md_t) :: edf_ID
 
+  call h5open_f(h5_error)
 
   call PTparse(HCF,'HMF_in',7)
   Nx = PTread_i(HCF,'Nx')
