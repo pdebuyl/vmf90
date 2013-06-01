@@ -10,6 +10,8 @@ program runAB
 
   integer :: n_top, n_steps, t_top, t_step, n_images, t_images, t
   double precision :: DT, width, bag, e0
+  double precision :: beta, fzero, ics, m0, norme
+  integer :: i,m
 
   integer, parameter :: time_number = 19
   double precision :: vals(time_number)
@@ -51,6 +53,20 @@ program runAB
      call init_carre(H%A, width, bag)
   else if (IC.eq.'fromHMF') then
      call load_data_from_h5(H%A, 'hmf.h5', 'data/t00400/f')
+  else if (IC.eq.'LB') then
+     beta = PTread_d(HCF, 'betaA')
+     fzero = PTread_d(HCF, 'fzeroA')
+     ics = PTread_d(HCF, 'icsA')
+     m0 = PTread_d(HCF, 'm0A')
+     do i=1,H%A%Nx
+        do m=1,H%A%Nv
+           H%A%f(i,m) = fzero/(1.d0+ &
+           exp( beta*(0.5d0*get_v(H%A,m)**2 - m0*cos(get_x(H%A,i)) )) / ics &
+                )
+        end do
+     end do
+     norme = sum(H%A%f(1:H%A%Nx,:))* H%A%dx * H%A%dv
+     H%A%f = H%A%f / norme
   else
      write(*,*) 'unknown IC', IC
      stop
@@ -62,6 +78,11 @@ program runAB
      if (width > PI) width = PI
      bag = PTread_d(HCF,'bagB')
      call init_carre(H%B, width, bag)
+  else if (IC.eq.'wb_eps') then
+     width = PTread_d(HCF,'widthB')
+     if (width > PI) width = PI
+     bag = PTread_d(HCF,'bagB')
+     call init_carre(H%B, width, bag,epsilon=PTread_d(HCF,'epsB'))
   else
      write(*,*) 'unknown IC', IC
      stop
