@@ -30,6 +30,7 @@ program runHMF
 
   integer :: Nx, Nv
   double precision :: width, bag, e0, m0, epsilon
+  double precision :: beta, fzero, ics
   double precision :: vmax, DT
   integer :: i,m,t,t_top, n_images, t_images
   integer :: n_steps, n_top
@@ -109,6 +110,20 @@ program runHMF
      norme = sum(H%V%f(1:H%V%Nx,:))* H%V%dx * H%V%dv
      H%V%f = H%V%f / norme
      write(*,*) sum(H%V%f(1:H%V%Nx,:))*H%V%dx*H%V%dv-1.d0
+  else if (IC.eq.'LB') then
+     beta = PTread_d(HCF, 'beta')
+     fzero = PTread_d(HCF, 'fzero')
+     ics = PTread_d(HCF, 'ics')
+     m0 = PTread_d(HCF, 'm0')
+     do i=1,H%V%Nx
+        do m=1,H%V%Nv
+           H%V%f(i,m) = fzero/(1.d0+ &
+           exp( beta*(0.5d0*get_v(H%V,m)**2 - m0*cos(get_x(H%V,i)) )) / ics &
+                )
+        end do
+     end do
+     norme = sum(H%V%f(1:H%V%Nx,:))* H%V%dx * H%V%dv
+     H%V%f = H%V%f / norme
   else if (IC.eq.'squared_lorentzian') then
      call init_squared_lorentzian(H%V, PTread_d(HCF,'lorentz_gamma'), &
           epsilon=PTread_d(HCF,'lorentz_epsilon'))
