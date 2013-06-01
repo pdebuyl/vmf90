@@ -34,6 +34,7 @@
 module Vlasov_module
   use spline_module
   use HDF5
+  use h5md
   implicit none
 
   !> Value of Pi computed via N[Pi,35] in Mathematica
@@ -713,24 +714,20 @@ module Vlasov_module
     end subroutine write_data_group_h5
 
     subroutine write_grid_info(this, thisgrid, model)
-      type(datafile_h5), intent(inout) :: this
+      integer(HID_T), intent(inout) :: this
       type(grid), intent(in) :: thisgrid
       character(len=*), intent(in) :: model
-      
-      integer(HID_T) :: s_id, d_id
-      integer(HSIZE_T) :: dims(1)
-      
-      call write_info_string_h5(this, 'model', 'FEL')
-      call write_info_integer_h5(this, 'Nx', thisgrid%Nx)
-      call write_info_integer_h5(this, 'Nv', thisgrid%Nv)
-      call write_info_double_h5(this, 'DT', thisgrid%DT)
-      call write_info_double_h5(this, 'xmin', thisgrid%xmin)
-      call write_info_double_h5(this, 'xmax', thisgrid%xmax)
-      call write_info_double_h5(this, 'vmin', thisgrid%vmin)
-      call write_info_double_h5(this, 'vmax', thisgrid%vmax)
-      call write_info_double_h5(this, 'dx', thisgrid%dx)
-      call write_info_double_h5(this, 'dv', thisgrid%dv)
-      call write_info_integer_h5(this, 'ntime', this%ntime)
+
+      call h5md_write_par(this, 'model', model)
+      call h5md_write_par(this, 'Nx', thisgrid%Nx)
+      call h5md_write_par(this, 'Nv', thisgrid%Nv)
+      call h5md_write_par(this, 'DT', thisgrid%DT)
+      call h5md_write_par(this, 'xmin', thisgrid%xmin)
+      call h5md_write_par(this, 'xmax', thisgrid%xmax)
+      call h5md_write_par(this, 'vmin', thisgrid%vmin)
+      call h5md_write_par(this, 'vmax', thisgrid%vmax)
+      call h5md_write_par(this, 'dx', thisgrid%dx)
+      call h5md_write_par(this, 'dv', thisgrid%dv)
      
     end subroutine write_grid_info
 

@@ -57,6 +57,12 @@ module HMF_module
      double precision :: epsilon
      !> External field.
      double precision :: Hfield
+     !> Entropy
+     double precision :: entropy
+     !> I2
+     double precision :: I2
+     !> I3
+     double precision :: I3
   end type HMF
   
 contains
@@ -164,15 +170,11 @@ contains
   !> Computes the macroscopic observables.
   !!
   !! @param this A type(HMF) variable.
-  !! @param phys An array holding the observables.
-  !! @param time The real-valued time. Is inserted with the observables in phys.
-  subroutine compute_phys(this, phys, time)
+  subroutine compute_phys(this)
     type(HMF), intent(inout) :: this
-    double precision, intent(out) :: phys(:)
-    double precision, intent(in) :: time
 
     integer :: i,m
-    double precision :: masse, I2, I3, entropy, loopf
+    double precision :: loopf
 
     if (this%is_ext) then
        this%V%en_int= this%epsilon * 0.5d0 * (1.d0 - this%Mx**2 - this%My**2) + this%Hfield*(1-this%Mx)
@@ -181,32 +183,29 @@ contains
     end if
     this%V%en_kin = 0.d0
     this%V%momentum = 0.d0
-    masse = 0.d0
-    I2 = 0.d0 ; I3 = 0.d0 ; entropy = 0.d0
+    this%V%masse = 0.d0
+    this%I2 = 0.d0 ; this%I3 = 0.d0 ; this%entropy = 0.d0
     do i=1,this%V%Nx
        do m=1,this%V%Nv
           loopf = this%V%f(i,m)
           this%V%en_kin = this%V%en_kin + get_v(this%V,m)**2 * loopf
           this%V%momentum = this%V%momentum + get_v(this%V,m) * loopf
-          I2 = I2 + loopf**2
-          I3 = I3 + loopf**3
+          this%I2 = this%I2 + loopf**2
+          this%I3 = this%I3 + loopf**3
           if (loopf.gt.0.d0 .and. loopf.lt.this%f0) then
              loopf = loopf/this%f0
-             entropy = entropy + loopf*log(loopf) + (1.d0-loopf)*log(1.d0-loopf)
+             this%entropy = this%entropy + loopf*log(loopf) + (1.d0-loopf)*log(1.d0-loopf)
           end if
        end do
     end do
-    masse = sum(this%V%f(1:this%V%Nx,:))
+    this%V%masse = sum(this%V%f(1:this%V%Nx,:))
     this%V%en_kin = this%V%en_kin*0.5d0  * this%V%dx * this%V%dv
     this%V%momentum = this%V%momentum    * this%V%dx * this%V%dv
-    masse    = masse                     * this%V%dx * this%V%dv
-    I2       = I2                        * this%V%dx * this%V%dv
-    I3       = I3                        * this%V%dx * this%V%dv
-    entropy  = entropy                   * this%V%dx * this%V%dv
+    this%V%masse    = this%V%masse       * this%V%dx * this%V%dv
+    this%I2  = this%I2                   * this%V%dx * this%V%dv
+    this%I3  = this%I3                   * this%V%dx * this%V%dv
+    this%entropy  = this%entropy         * this%V%dx * this%V%dv
     this%V%energie = this%V%en_int + this%V%en_kin
-
-    phys = (/time, masse, this%V%energie, this%V%en_int, this%V%en_kin, this%V%momentum, this%Mx, this%My, I2, I3, entropy/)
-
 
   end subroutine compute_phys
 
@@ -230,31 +229,5 @@ contains
     end do
      
   end subroutine compute_edf
-
-  subroutine write_edf_h5(this, thisHMF, time)
-    type(datafile_h5), intent(inout) :: this
-    type(HMF), intent(in) :: thisHMF
-    integer, intent(in) :: time
-
-    character(len=32) g_name, edf_name
-    integer(HID_T) :: g_id, DSP_id, DSET_id
-    integer(HSIZE_T) :: dims(1)
-
-    write(g_name, '(a1,i5.5)') 't', time
-
-    dims(1) = size(thisHMF%edf)
-
-    call h5gopen_f(this%data_g_id, g_name, g_id, this%error)
-    call h5screate_simple_f(1, dims, DSP_id, this%error)
-    call h5dcreate_f(g_id,'edf', H5T_NATIVE_DOUBLE, DSP_id, DSET_id, this%error)
-
-    call h5dwrite_f(DSET_id, H5T_NATIVE_DOUBLE, thisHMF%edf, dims, this%error)
-
-    call h5dclose_f(DSET_id, this%error)
-    call h5sclose_f(DSP_id, this%error)
-
-    call h5gclose_f(g_id, this%error)
-
-  end subroutine write_edf_h5
 
 end module HMF_module

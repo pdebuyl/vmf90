@@ -21,12 +21,12 @@ program runHMF
   use HMF_module
   use ParseText
   use vmf90
+  use h5md
   implicit none
   
   type(HMF) :: H
   
   type(PTo) :: HCF
-  type(datafile_h5) :: h5hmf
 
   integer :: Nx, Nv
   double precision :: width, bag, e0, m0, epsilon
@@ -40,12 +40,14 @@ program runHMF
   real*4 :: perim(nc), z(nc)
   real*4, allocatable :: data(:,:), x(:), y(:)
   double precision :: com
-  integer, parameter :: time_number = 11
-  double precision :: vals(time_number)
-  character(len=32) :: time_names(time_number), IC
+  double precision :: realtime
+  character(len=32) :: IC
   character(len=13) :: fname
 
-! Parse config file and create HMF and datafile data
+  integer(HID_T) :: file_ID
+  type(h5md_t) :: mass_ID, energy_ID, int_ID, kin_ID, momentum_ID, Mx_ID, My_ID, I2_ID, I3_ID, entropy_ID
+  type(h5md_t) :: edf_ID
+
 
   call PTparse(HCF,'HMF_in',7)
   Nx = PTread_i(HCF,'Nx')
@@ -60,21 +62,16 @@ program runHMF
 
   call newHMF(H,Nx,Nv,vmax, Nedf=PTread_i(HCF,'Nedf'), model=PTread_s(HCF, 'model'), Hfield=PTread_d(HCF,'Hfield') )
   H%V%DT = DT
-  call create_h5(h5hmf, H%V, PTread_s(HCF, 'out_file'), n_top, time_number)
 
-
-  time_names = (/'time    ', 'mass    ', 'energy  ', 'int     ', &
-                 'kin     ', 'momentum', 'Mx      ', 'My      ', &
-                 'I2      ', 'I3      ', 'entropy '/)
-  call write_info_string_array_h5(h5hmf, 'time_names', time_names)
+  call h5md_create_file(file_ID, 'hmf.h5md', 'Pierre de Buyl <pdebuyl@ulb.ac.be>', 'vmf90_hmf', 'No version information yet')
 
   call vmf90_info()
   write(*,*) 'Running HMF with ', Nx, 'x', Nv,  'points'
 
   if (allocated(H%edf)) then
-     call write_info_double_h5(h5hmf, 'e_min', H%e_min)
-     call write_info_double_h5(h5hmf, 'e_max', H%e_max)
-     call write_info_double_h5(h5hmf, 'de', H%de)
+     call h5md_write_par(file_ID, 'e_min', H%e_min)  
+     call h5md_write_par(file_ID, 'e_max', H%e_max)  
+     call h5md_write_par(file_ID, 'de', H%de)  
   end if
 
 ! Handle initial condition
@@ -135,7 +132,7 @@ program runHMF
 
   call PTkill(HCF)
 
-  call write_grid_info(h5hmf, H%V, 'HMF')
+  call write_grid_info(file_ID, H%V, 'HMF')
 
 ! fin de la condition initiale
 
@@ -150,12 +147,12 @@ program runHMF
   call compute_rho(H%V)
   call compute_M(H)
   call compute_phi(H%V)
-  call write_data_group_h5(h5hmf, H%V, 0)
-  call compute_phys(H, vals, t_top*DT)
-  call write_time_slice_h5(h5hmf, t_top, vals)
+  !call write_data_group_h5(h5hmf, H%V, 0)
+  call compute_phys(H)
+  !call write_time_slice_h5(h5hmf, t_top, vals)
   if (allocated(H%edf)) then
      call compute_edf(H)
-     call write_edf_h5(h5hmf, H, t_top)
+     call h5md_write_obs(edf_id, H%edf, t_top, realtime)
   end if
 
 
@@ -192,17 +189,17 @@ program runHMF
 
      call compute_rho(H%V)
      call compute_M(H)
-     call compute_phys(H, vals, t_top*n_steps*DT)
+     call compute_phys(H) !t_top*n_steps*DT)
      call compute_phi(H%V)
      if (t_top*n_images/n_top.ge.t_images) then
-        call write_data_group_h5(h5hmf, H%V, t_top)
+        !call write_data_group_h5(h5hmf, H%V, t_top)
         t_images = t_images + 1
         if (allocated(H%edf)) then
            call compute_edf(H)
-           call write_edf_h5(h5hmf, H, t_top)
+           call h5md_write_obs(edf_id, H%edf, t_top, realtime)
         end if
      end if
-     call write_time_slice_h5(h5hmf, t_top, vals)
+     !call write_time_slice_h5(h5hmf, t_top, vals)
 
   end do
 
@@ -210,6 +207,34 @@ program runHMF
 ! End of the simulation loop
 !
 
-  call close_h5(h5hmf)
+  !call close_h5(h5hmf)
+
+contains
+
+  subroutine begin_h5md
+    call h5md_create_obs(file_ID, 'mass', mass_ID, H%V%masse)
+    call h5md_create_obs(file_ID, 'energy', energy_ID, H%V%energie, link_from='mass')
+    call h5md_create_obs(file_ID, 'en_int', int_ID, H%V%en_int, link_from='mass')
+    call h5md_create_obs(file_ID, 'en_kin', kin_ID, H%V%en_kin, link_from='mass')
+    call h5md_create_obs(file_ID, 'momentum', momentum_ID, H%V%momentum, link_from='mass')
+    call h5md_create_obs(file_ID, 'Mx', Mx_ID, H%Mx, link_from='mass')
+    call h5md_create_obs(file_ID, 'My', My_ID, H%My, link_from='mass')
+    call h5md_create_obs(file_ID, 'I2', I2_ID, H%I2, link_from='mass')
+    call h5md_create_obs(file_ID, 'I3', I3_ID, H%I3, link_from='mass')
+    call h5md_create_obs(file_ID, 'edf', edf_ID, H%edf, link_from='mass')
+  end subroutine begin_h5md
+
+  subroutine write_obs
+    call h5md_write_obs(mass_ID, H%V%masse, t_top, realtime)
+    call h5md_write_obs(energy_ID, H%V%energie, t_top, realtime)
+    call h5md_write_obs(int_ID, H%V%en_int, t_top, realtime)
+    call h5md_write_obs(kin_ID, H%V%en_kin, t_top, realtime)
+    call h5md_write_obs(momentum_ID, H%V%momentum, t_top, realtime)
+    call h5md_write_obs(Mx_ID, H%Mx, t_top, realtime)
+    call h5md_write_obs(My_ID, H%My, t_top, realtime)
+    call h5md_write_obs(I2_ID, H%I2, t_top, realtime)
+    call h5md_write_obs(I3_ID, H%I3, t_top, realtime)
+    call h5md_write_obs(edf_ID, H%edf, t_top, realtime)
+  end subroutine write_obs
 
 end program runHMF
