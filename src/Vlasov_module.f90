@@ -593,4 +593,16 @@ module Vlasov_module
      
     end subroutine write_grid_info
 
+  !> Adds a fields group in a h5md file
+  !! @param file_id the HDF5 ID of the file.
+  subroutine create_fields_group(file_id)
+    integer(HID_T), intent(inout) :: file_id
+
+    integer(HID_T) :: g_id
+
+    call h5gcreate_f(file_id, 'fields', g_id, h5_error)
+    call h5gclose_f(g_id, h5_error)
+
+  end subroutine create_fields_group
+
 end module Vlasov_module
