@@ -144,13 +144,15 @@ program runHMF
 ! Computing of the macroscopic quantities of the initial condition, before entering the simulation loop
 !
 
+  call begin_h5md
   t_top=0
+  realtime=0.d0
   call compute_rho(H%V)
   call compute_M(H)
   call compute_phi(H%V)
   !call write_data_group_h5(h5hmf, H%V, 0)
   call compute_phys(H)
-  !call write_time_slice_h5(h5hmf, t_top, vals)
+  call write_obs
   if (allocated(H%edf)) then
      call compute_edf(H)
      call h5md_write_obs(edf_id, H%edf, t_top, realtime)
@@ -177,6 +179,8 @@ program runHMF
         call spline_x(H%V)
         call advection_x(H%V)
         H%V%f = H%V%g
+
+        realtime = realtime + DT
      end do
 
      call compute_rho(H%V)
@@ -200,7 +204,7 @@ program runHMF
            call h5md_write_obs(edf_id, H%edf, t_top, realtime)
         end if
      end if
-     !call write_time_slice_h5(h5hmf, t_top, vals)
+     call write_obs
 
   end do
 
@@ -235,7 +239,7 @@ contains
     call h5md_write_obs(My_ID, H%My, t_top, realtime)
     call h5md_write_obs(I2_ID, H%I2, t_top, realtime)
     call h5md_write_obs(I3_ID, H%I3, t_top, realtime)
-    call h5md_write_obs(edf_ID, H%edf, t_top, realtime)
+    !call h5md_write_obs(edf_ID, H%edf, t_top, realtime)
   end subroutine write_obs
 
 end program runHMF
