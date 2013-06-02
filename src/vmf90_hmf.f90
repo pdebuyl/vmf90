@@ -47,6 +47,7 @@ program runHMF
   integer(HID_T) :: file_ID
   type(h5md_t) :: mass_ID, energy_ID, int_ID, kin_ID, momentum_ID, Mx_ID, My_ID, I2_ID, I3_ID, entropy_ID
   type(h5md_t) :: edf_ID
+  type(h5md_t) :: f_ID, rho_ID, phi_ID
 
   call h5open_f(h5_error)
 
@@ -126,7 +127,8 @@ program runHMF
      call init_squared_lorentzian(H%V, PTread_d(HCF,'lorentz_gamma'), &
           epsilon=PTread_d(HCF,'lorentz_epsilon'))
   else if (IC.eq.'from_file') then
-     call load_data_from_h5(H%V,PTread_s(HCF,'IC_file'),trim(PTread_s(HCF,'IC_position')))
+     !call load_data_from_h5(H%V,PTread_s(HCF,'IC_file'),trim(PTread_s(HCF,'IC_position')))
+     stop 'no reload allowed yet'
   else
      stop 'unknown IC'
   end if
@@ -150,7 +152,7 @@ program runHMF
   call compute_rho(H%V)
   call compute_M(H)
   call compute_phi(H%V)
-  !call write_data_group_h5(h5hmf, H%V, 0)
+  call write_fields
   call compute_phys(H)
   call write_obs
   if (allocated(H%edf)) then
@@ -197,7 +199,7 @@ program runHMF
      call compute_phys(H) !t_top*n_steps*DT)
      call compute_phi(H%V)
      if (t_top*n_images/n_top.ge.t_images) then
-        !call write_data_group_h5(h5hmf, H%V, t_top)
+        call write_fields
         t_images = t_images + 1
         if (allocated(H%edf)) then
            call compute_edf(H)
@@ -227,6 +229,11 @@ contains
     call h5md_create_obs(file_ID, 'I2', I2_ID, H%I2, link_from='mass')
     call h5md_create_obs(file_ID, 'I3', I3_ID, H%I3, link_from='mass')
     call h5md_create_obs(file_ID, 'edf', edf_ID, H%edf, link_from='mass')
+
+    call create_fields_group(file_ID)
+    call h5md_create_obs(file_ID, 'f', f_ID, H%V%f, override_obs='fields')
+    call h5md_create_obs(file_ID, 'rho', rho_ID, H%V%rho, link_from='f', override_obs='fields')
+    call h5md_create_obs(file_ID, 'phi', phi_ID, H%V%phi, link_from='f', override_obs='fields')
   end subroutine begin_h5md
 
   subroutine write_obs
@@ -241,5 +248,11 @@ contains
     call h5md_write_obs(I3_ID, H%I3, t_top, realtime)
     !call h5md_write_obs(edf_ID, H%edf, t_top, realtime)
   end subroutine write_obs
+
+  subroutine write_fields
+    call h5md_write_obs(f_ID, H%V%f, t_top, realtime)
+    call h5md_write_obs(rho_ID, H%V%rho, t_top, realtime)
+    call h5md_write_obs(phi_ID, H%V%phi, t_top, realtime)
+  end subroutine write_fields
 
 end program runHMF
