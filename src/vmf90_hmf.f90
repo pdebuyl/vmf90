@@ -214,7 +214,7 @@ program runHMF
 ! End of the simulation loop
 !
 
-  !call close_h5(h5hmf)
+  call h5close_f(h5_error)
 
 contains
 
