@@ -32,17 +32,17 @@ vmf90.o: vmf90.f90 vmf90_version.h
 %.o : %.f90
 	$(F90) -c $<
 
-vmf90_hmf: spline_module.o Vlasov_module.o HMF_module.o ParseText.o vmf90_version.h vmf90.o vmf90_hmf.o
-	$(F90) spline_module.o Vlasov_module.o HMF_module.o ParseText.o vmf90.o vmf90_hmf.o -o vmf90_hmf
+vmf90_hmf: h5md.o spline_module.o Vlasov_module.o HMF_module.o ParseText.o vmf90_version.h vmf90.o vmf90_hmf.o
+	$(F90) h5md.o spline_module.o Vlasov_module.o HMF_module.o ParseText.o vmf90.o vmf90_hmf.o -o vmf90_hmf
 
-vmf90_fel: spline_module.o Vlasov_module.o FEL_module.o ParseText.o vmf90_version.h vmf90.o vmf90_fel.o
-	$(F90) spline_module.o Vlasov_module.o FEL_module.o ParseText.o vmf90.o vmf90_fel.o -o vmf90_fel
+vmf90_fel: h5md.o spline_module.o Vlasov_module.o FEL_module.o ParseText.o vmf90_version.h vmf90.o vmf90_fel.o
+	$(F90) h5md.o spline_module.o Vlasov_module.o FEL_module.o ParseText.o vmf90.o vmf90_fel.o -o vmf90_fel
 
-vmf90_ab: spline_module.o Vlasov_module.o AB_module.o ParseText.o vmf90_version.h vmf90.o vmf90_ab.o
-	$(F90) spline_module.o Vlasov_module.o AB_module.o ParseText.o vmf90.o vmf90_ab.o -o vmf90_ab
+vmf90_ab: h5md.o spline_module.o Vlasov_module.o AB_module.o ParseText.o vmf90_version.h vmf90.o vmf90_ab.o
+	$(F90) h5md.o spline_module.o Vlasov_module.o AB_module.o ParseText.o vmf90.o vmf90_ab.o -o vmf90_ab
 
 clean:
-	rm -f spline_module.o Vlasov_module.o HMF_module.o AB_module.o ParseText.o vmf90.o FEL_module.o \
+	rm -f h5md.o spline_module.o Vlasov_module.o HMF_module.o AB_module.o ParseText.o vmf90.o FEL_module.o \
 	vmf90_hmf.o vmf90_fel.o vmf90_ab.o \
 	spline_module.mod vlasov_module.mod parsetext.mod vmf90.mod vmf90.mod \
 	hmf_module.mod fel_module.mod ab_module.mod \
