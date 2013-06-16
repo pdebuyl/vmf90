@@ -52,6 +52,7 @@ module Vlasov_module
 
      double precision, allocatable :: f(:,:)
      double precision, allocatable :: f2(:,:), g(:,:)
+     double precision, allocatable :: d2(:)
      double precision, allocatable :: rho(:), phi(:), force(:)
   end type grid
 
@@ -94,6 +95,7 @@ module Vlasov_module
       
       allocate(this%f(Nx+bonus_gridpoint,Nv))
       allocate(this%f2(Nx+bonus_gridpoint,Nv))
+      allocate(this%d2(max(Nx+bonus_gridpoint,Nv)))
       allocate(this%g(Nx+bonus_gridpoint,Nv))
       allocate(this%rho(Nx))
       allocate(this%force(Nx))
@@ -305,6 +307,32 @@ module Vlasov_module
       end do
 
     end subroutine advection_x
+
+    !> Advances the solution f by spline interpolation in the v-direction.
+    !!
+    !! @param this A type(grid) variable.
+    subroutine advance_v(this, h)
+      type(grid), intent(inout) :: this
+      double precision, intent(in) :: h
+
+      integer :: i, m, l
+      double precision :: v
+
+      l = size(this% f, dim=2)
+
+      do i=1,this%Nx
+         call spline_natural(this% f(i,:), this% dv, this% d2(1:l))
+         do m=1,this%Nv
+            v = get_v(this,m)-this%DT*h*this%force(i)
+            if (v-this% vmin.le.0.d0 .or. v-this%vmin.ge.this%vmax-this%vmin) then
+               this%g(i,m) = 0.d0
+            else
+               this%g(i,m) = spline_2(this% f(i,:), this% dv, this% d2(1:l), v - this% vmin)
+            end if
+         end do
+      end do
+
+    end subroutine advance_v
 
     !> Performs a full timestep advection in the v-direction.
     !!

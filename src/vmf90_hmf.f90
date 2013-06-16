@@ -174,8 +174,7 @@ program runHMF
         
         call compute_rho(H%V)
         call compute_force(H)
-        call spline_v(H%V)
-        call advection_v(H%V)
+        call advance_v(H%V, 1.d0)
         H%V%f = H%V%g
      
         call spline_x(H%V)
@@ -187,8 +186,7 @@ program runHMF
 
      call compute_rho(H%V)
      call compute_force(H)
-     call spline_v(H%V)
-     call advection_v(H%V)
+     call advance_v(H%V, 1.d0)
      H%V%f = H%V%g
      call spline_x(H%V)
      call advection_x_demi(H%V)
