@@ -167,8 +167,7 @@ program runHMF
 
   do t_top = 1,n_top
 
-     call spline_x(H%V)
-     call advection_x_demi(H%V)
+     call advance_x(H%V, 0.5d0)
      H%V%f = H%V%g
      do t=1,n_steps-1
         
@@ -177,8 +176,7 @@ program runHMF
         call advance_v(H%V, 1.d0)
         H%V%f = H%V%g
      
-        call spline_x(H%V)
-        call advection_x(H%V)
+        call advance_x(H%V, 1.d0)
         H%V%f = H%V%g
 
         realtime = realtime + DT
@@ -188,8 +186,7 @@ program runHMF
      call compute_force(H)
      call advance_v(H%V, 1.d0)
      H%V%f = H%V%g
-     call spline_x(H%V)
-     call advection_x_demi(H%V)
+     call advance_x(H%V, 0.5d0)
      H%V%f = H%V%g
 
      call compute_rho(H%V)

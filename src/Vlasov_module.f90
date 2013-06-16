@@ -308,6 +308,47 @@ module Vlasov_module
 
     end subroutine advection_x
 
+    !> Advances the solution f by spline interpolation in the x-direction.
+    !!
+    !! @param this A type(grid) variable.
+    !! @param h fraction of timestep this%DT to use.
+    subroutine advance_x(this, h)
+      type(grid), intent(inout) :: this
+      double precision, intent(in) :: h
+
+      integer :: i, m, l
+      double precision :: x
+
+      ! the last column is set to be equal to the first to allow interpolation beyond xmin+Nx*dx (up to xmax!)
+      this%f(this%Nx+1,:) = this%f(1,:)
+
+      l = size(this% f, dim=1)
+
+      do m=1,this%Nv
+         call spline_periodic(this%f(1:this%Nx,m), this%dx, this%d2(1:this%Nx))
+         this% d2(this%Nx+1) = this% d2(1)
+         do i=1,this%Nx
+            x = get_x(this,i)-this%DT*h*get_v(this,m)
+            if (x.le.this%xmin .or. x.ge.this%xmax) then
+               if (this%is_periodic) then
+                  if (x.le.this%xmin) then
+                     x = x + this%xmax-this%xmin
+                  end if
+                  if (x.ge.this%xmax) then
+                     x = x - (this%xmax-this%xmin)
+                  end if
+               else
+                  this%g(i,m) = 0.d0
+               end if
+            end if
+
+            this%g(i,m) = spline_2(this% f(:,m), this% dx, this% d2(1:l), x - this% xmin)
+
+         end do
+      end do
+
+    end subroutine advance_x
+
     !> Advances the solution f by spline interpolation in the v-direction.
     !!
     !! @param this A type(grid) variable.
