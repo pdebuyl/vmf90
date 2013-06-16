@@ -311,6 +311,7 @@ module Vlasov_module
     !> Advances the solution f by spline interpolation in the v-direction.
     !!
     !! @param this A type(grid) variable.
+    !! @param h fraction of timestep this%DT to use.
     subroutine advance_v(this, h)
       type(grid), intent(inout) :: this
       double precision, intent(in) :: h
