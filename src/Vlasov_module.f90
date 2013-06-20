@@ -51,7 +51,6 @@ module Vlasov_module
      logical :: is_periodic
 
      double precision, allocatable :: f(:,:)
-     double precision, allocatable :: f2(:,:), g(:,:)
      double precision, allocatable :: d2(:), copy(:)
      double precision, allocatable :: rho(:), phi(:), force(:)
   end type grid
@@ -94,9 +93,7 @@ module Vlasov_module
       end if
       
       allocate(this%f(Nx+bonus_gridpoint,Nv))
-      allocate(this%f2(Nx+bonus_gridpoint,Nv))
       allocate(this%d2(max(Nx+bonus_gridpoint,Nv)))
-      allocate(this%g(Nx+bonus_gridpoint,Nv))
       allocate(this%copy(max(Nx+bonus_gridpoint,Nv)))
       allocate(this%rho(Nx))
       allocate(this%force(Nx))
@@ -188,127 +185,6 @@ module Vlasov_module
     end function get_v
 
 
-    !> Computes the second derivatives for spline interpolation in the x-direction.
-    !!
-    !! @param this A type(grid) variable.
-    subroutine spline_x(this)
-      type(grid), intent(inout) :: this
-
-      integer m
-      
-      ! the last column is set to be equal to the first to allow interpolation beyond xmin+Nx*dx (up to xmax!)
-      this%f(this%Nx+1,:) = this%f(1,:)
-
-      do m=1,this%Nv
-         call spline_periodic(this%f(1:this%Nx,m), this%dx, this%f2(1:this%Nx,m))
-         this% f2(this%Nx+1,m) = this% f2(1,m)
-      end do
-
-    end subroutine spline_x
-
-    !> Returns the interpolated value on the m-th row of the grid.
-    !!
-    !! If the grid is periodic, takes it into account. Else, returns 0 outside of the box.
-    !!
-    !! @param this A type(grid) variable.
-    !! @param x_in The point at which to interpolate.
-    !! @param m The velocity row index.
-    !! @return Interpolated value of f.
-    double precision function splint_x(this,x_in,m)
-      type(grid), intent(in) :: this
-      double precision, intent(in) :: x_in
-      integer, intent(in) :: m
-      double precision :: x
-
-      x = x_in
-
-      if (x.le.this%xmin .or. x.ge.this%xmax) then
-         if (this%is_periodic) then
-            if (x.le.this%xmin) then
-               x = x + this%xmax-this%xmin
-            end if
-            if (x.ge.this%xmax) then 
-               x = x - (this%xmax-this%xmin)
-            end if
-         else
-            splint_x = 0.d0
-            return
-         end if
-      end if
-
-      splint_x = spline_2(this% f(:,m), this% dx, this% f2(:,m), x - this% xmin)
-      
-    end function splint_x
-    
-    !> Computes the second derivatives for spline interpolation in the v-direction.
-    !!
-    !! @param this A type(grid) variable.
-    subroutine spline_v(this)
-      type(grid), intent(inout) :: this
-
-      integer i
-      
-      do i=1,this%Nx
-         call spline_natural(this% f(i,:), this% dv, this% f2(i,:))
-      end do
-
-    end subroutine spline_v
-
-    !> Returns the interpolated value on the i-th column of the grid.
-    !!
-    !! Returns 0 outside of the box.
-    !!
-    !! @param this A type(grid) variable.
-    !! @param v The point at which to interpolate.
-    !! @param i The position column index.
-    !! @return Interpolated value of f.
-    double precision function splint_v(this,v,i)
-      type(grid), intent(in) :: this
-      double precision, intent(in) :: v
-      integer, intent(in) :: i
-
-      if (v-this% vmin.le.0.d0 .or. v-this%vmin.ge.this%vmax-this%vmin) then
-         splint_v = 0.d0
-         return
-      end if
-
-      splint_v = spline_2(this% f(i,:), this% dv, this% f2(i,:), v - this% vmin)
-      
-    end function splint_v
-
-
-    !> Performs a half timestep advection in the x-direction.
-    !!
-    !! @param this A type(grid) variable.
-    subroutine advection_x_demi(this)
-      type(grid), intent(inout) :: this
-      
-      integer :: i,m
-
-      do i=1,this%Nx
-         do m=1,this%Nv
-            this%g(i,m) = splint_x(this,get_x(this,i)-this%DT*get_v(this,m)*0.5d0,m)
-         end do
-      end do
-
-    end subroutine advection_x_demi
-
-    !> Performs a full timestep advection in the x-direction.
-    !!
-    !! @param this A type(grid) variable.
-    subroutine advection_x(this)
-      type(grid), intent(inout) :: this
-      
-      integer :: i,m
-
-      do i=1,this%Nx
-         do m=1,this%Nv
-            this%g(i,m) = splint_x(this,get_x(this,i)-this%DT*get_v(this,m),m)
-         end do
-      end do
-
-    end subroutine advection_x
-
     !> Advances the solution f by spline interpolation in the x-direction.
     !!
     !! @param this A type(grid) variable.
@@ -379,22 +255,6 @@ module Vlasov_module
 
     end subroutine advance_v
 
-    !> Performs a full timestep advection in the v-direction.
-    !!
-    !! @param this A type(grid) variable.
-    subroutine advection_v(this)
-      type(grid), intent(inout) :: this
-
-      integer :: i,m
-
-      do i=1,this%Nx
-         do m=1,this%Nv
-            this%g(i,m) = splint_v(this,get_v(this,m)-this%DT*this%force(i),i)
-         end do
-      end do
-         
-    end subroutine advection_v
-    
     !> Writes the distribution function f in a file of name "xvf.iiiii" in the directory
     !! "images" that should exist beforehand.
     !!
