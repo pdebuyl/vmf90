@@ -163,16 +163,13 @@ program runHMF
   do t_top = 1,n_top
 
      call advance_x(H%V, 0.5d0)
-     H%V%f = H%V%g
      do t=1,n_steps-1
         
         call compute_rho(H%V)
         call compute_force(H)
         call advance_v(H%V, 1.d0)
-        H%V%f = H%V%g
      
         call advance_x(H%V, 1.d0)
-        H%V%f = H%V%g
 
         realtime = realtime + DT
      end do
@@ -180,9 +177,7 @@ program runHMF
      call compute_rho(H%V)
      call compute_force(H)
      call advance_v(H%V, 1.d0)
-     H%V%f = H%V%g
      call advance_x(H%V, 0.5d0)
-     H%V%f = H%V%g
 
      call compute_rho(H%V)
      call compute_M(H)

@@ -52,7 +52,7 @@ module Vlasov_module
 
      double precision, allocatable :: f(:,:)
      double precision, allocatable :: f2(:,:), g(:,:)
-     double precision, allocatable :: d2(:)
+     double precision, allocatable :: d2(:), copy(:)
      double precision, allocatable :: rho(:), phi(:), force(:)
   end type grid
 
@@ -97,6 +97,7 @@ module Vlasov_module
       allocate(this%f2(Nx+bonus_gridpoint,Nv))
       allocate(this%d2(max(Nx+bonus_gridpoint,Nv)))
       allocate(this%g(Nx+bonus_gridpoint,Nv))
+      allocate(this%copy(max(Nx+bonus_gridpoint,Nv)))
       allocate(this%rho(Nx))
       allocate(this%force(Nx))
       allocate(this%phi(Nv))
@@ -325,7 +326,8 @@ module Vlasov_module
       l = size(this% f, dim=1)
 
       do m=1,this%Nv
-         call spline_periodic(this%f(1:this%Nx,m), this%dx, this%d2(1:this%Nx))
+         this% copy(1:l) = this% f(:,m)
+         call spline_periodic(this%copy(1:this%Nx), this%dx, this%d2(1:this%Nx))
          this% d2(this%Nx+1) = this% d2(1)
          do i=1,this%Nx
             x = get_x(this,i)-this%DT*h*get_v(this,m)
@@ -338,11 +340,11 @@ module Vlasov_module
                      x = x - (this%xmax-this%xmin)
                   end if
                else
-                  this%g(i,m) = 0.d0
+                  this%f(i,m) = 0.d0
                end if
             end if
 
-            this%g(i,m) = spline_2(this% f(:,m), this% dx, this% d2(1:l), x - this% xmin)
+            this%f(i,m) = spline_2(this% copy(1:l), this% dx, this% d2(1:l), x - this% xmin)
 
          end do
       end do
@@ -363,13 +365,14 @@ module Vlasov_module
       l = size(this% f, dim=2)
 
       do i=1,this%Nx
-         call spline_natural(this% f(i,:), this% dv, this% d2(1:l))
+         this% copy(1:l) = this% f(i,:)
+         call spline_natural(this% copy(1:l), this% dv, this% d2(1:l))
          do m=1,this%Nv
             v = get_v(this,m)-this%DT*h*this%force(i)
             if (v-this% vmin.le.0.d0 .or. v-this%vmin.ge.this%vmax-this%vmin) then
-               this%g(i,m) = 0.d0
+               this%f(i,m) = 0.d0
             else
-               this%g(i,m) = spline_2(this% f(i,:), this% dv, this% d2(1:l), v - this% vmin)
+               this%f(i,m) = spline_2(this% copy(1:l), this% dv, this% d2(1:l), v - this% vmin)
             end if
          end do
       end do
