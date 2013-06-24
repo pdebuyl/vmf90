@@ -35,17 +35,12 @@ program runHMF
   integer :: i,m,t,t_top, n_images, t_images
   integer :: n_steps, n_top
   
-  double precision :: norme, masse
-  integer, parameter :: nc=3
-  real*4 :: perim(nc), z(nc)
-  real*4, allocatable :: data(:,:), x(:), y(:)
-  double precision :: com
+  double precision :: norme
   double precision :: realtime
   character(len=32) :: IC
-  character(len=13) :: fname
 
   integer(HID_T) :: file_ID
-  type(h5md_t) :: mass_ID, energy_ID, int_ID, kin_ID, momentum_ID, Mx_ID, My_ID, I2_ID, I3_ID, entropy_ID
+  type(h5md_t) :: mass_ID, energy_ID, int_ID, kin_ID, momentum_ID, Mx_ID, My_ID, I2_ID, I3_ID
   type(h5md_t) :: edf_ID
   type(h5md_t) :: f_ID, rho_ID, phi_ID
 
