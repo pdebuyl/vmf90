@@ -157,7 +157,8 @@ contains
 
     if (this%is_ext) then
        do i=1,this%V%Nx
-          this%V%force(i) = cos(get_x(this%V,i))*(this%epsilon*this%My) - sin(get_x(this%V,i)) * (this%Mx*this%epsilon + this%Hfield)
+          this%V%force(i) = cos(get_x(this%V,i))*(this%epsilon*this%My) &
+               - sin(get_x(this%V,i)) * (this%Mx*this%epsilon + this%Hfield)
        end do
     else
        do i=1,this%V%Nx
@@ -222,7 +223,9 @@ contains
     this%edf=0.d0
     do i=1,this%V%Nx
        do m=1,this%V%Nv
-          h = get_v(this%V,m)**2*0.5d0 + this%epsilon*(1.d0-(this%Mx*cos(get_x(this%V,i))+this%My*sin(get_x(this%V,i)))) + this%Hfield*(1.d0-cos(get_x(this%V,i)))
+          h = get_v(this%V,m)**2*0.5d0 &
+               + this%epsilon*(1.d0-(this%Mx*cos(get_x(this%V,i))+this%My*sin(get_x(this%V,i)))) &
+               + this%Hfield*(1.d0-cos(get_x(this%V,i)))
           pos = max(min(floor((h-this%e_min)/this%de),size(this%edf)-1)+1, 1)
           this%edf(pos) = this%edf(pos) + this%V%f(i,m)*this%V%dx*this%V%dv/this%de
        end do
