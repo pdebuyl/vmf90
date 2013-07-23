@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Copyright (C) 2009-2011 Pierre de Buyl
+# Copyright (C) 2009-2013 Pierre de Buyl
 
 # This file is part of vmf90
 
@@ -42,21 +42,12 @@ except:
 import numpy as np
 import matplotlib.pyplot as plt
 
-d = dict()
-i=0
-for n in a['info/time_names'].value:
-  d[n] = i
-  i+=1
-
-names = a['data'].keys()
-n = len(names)
-t = a['time'].value
-Nx = a['info/Nx'].value
-Nv = a['info/Nv'].value
-xmin = a['info/xmin'].value
-xmax = a['info/xmax'].value
-vmin = a['info/vmin'].value
-vmax = a['info/vmax'].value
+Nx = a['parameters']['Nx'].value
+Nv = a['parameters']['Nv'].value
+xmin = a['parameters']['xmin'].value
+xmax = a['parameters']['xmax'].value
+vmin = a['parameters']['vmin'].value
+vmax = a['parameters']['vmax'].value
 extent = [xmin,xmax,vmin,vmax]
 
 plt.rc('figure.subplot', left = 0.17)
@@ -67,9 +58,8 @@ do_show = False
 if (cmd == 'plot'):
   n_plot = 0
   for var in argv[3:]:
-    if (var in d):
-      idx = d[var]
-      plt.plot(t[0,:],t[idx,:],label=var)
+    if var in a['observables']:
+      plt.plot(a['observables'][var]['time'],a['observables'][var]['value'],label=var)
       n_plot+=1
     else:
       print "variable %s not found" % (var,)
@@ -78,30 +68,39 @@ if (cmd == 'plot'):
     plt.legend()
     do_show = True
   else:
-    print "available observables: ", a['info/time_names'].value
+    print "available observables: ", a['observables'].keys()
 
 elif (cmd == 'snaps'):
+  n = a['fields']['f']['value'].shape[0]
   for i in range(3):
     plt.subplot(1,3,i+1)
-    plt.imshow(a['data'][names[i*n/3]]['f'],origin='lower',vmin=0.,extent=extent)
+    plt.imshow(a['fields']['f']['value'][i*n/3],origin='lower',vmin=0.,extent=extent)
     plt.xlabel(r'$x$')
     plt.ylabel(r'$v$')
   do_show = True
 
 elif (cmd == 'dump'):
-  indices = []
+  step = None
+  var_list = []
   for var in argv[3:]:
-    if (var in d):
-      indices.append(d[var])
+    if var in a['observables']:
+      if step is None:
+        step = a['observables'][var]['step'][:]
+        time = a['observables'][var]['time'][:]
+      else:
+        assert np.allclose(step,a['observables'][var]['step'][:])
+      var_list.append(var)
     else:
       print "variable %s not found" % (var,)
-  if (len(indices) > 0):
-    for i in range(t.shape[1]):
-      for j in indices:
-        print "%20.12f " % (t[j,i],) ,
+      exit()
+  if len(var_list) > 0:
+    for i in range(len(step)):
+      print time[i],
+      for var in var_list:
+        print "%20.12f " % (a['observables'][var]['value'][i],) ,
       print "\n" ,
   else:
-    print "available observables: ", a['info/time_names'].value
+    print "available observables: ", a['observables'].keys()
 
 a.close()
 
