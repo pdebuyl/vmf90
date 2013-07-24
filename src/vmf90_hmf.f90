@@ -181,7 +181,7 @@ program runHMF
 
      call compute_rho(H%V)
      call compute_M(H)
-     call compute_phys(H) !t_top*n_steps*DT)
+     call compute_phys(H)
      call compute_phi(H%V)
      if (t_top*n_images/n_top.ge.t_images) then
         call write_fields
