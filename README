@@ -1,7 +1,7 @@
 vmf90 : Vlasov solver for mean-field systems in Fortran 90
 ==========================================================
 
-Copyright © 2009-2011 Pierre de Buyl
+Copyright © 2009-2013 Pierre de Buyl
 
 vmf90 is a software for the numerical resolution of the Vlasov equation for 
 mean-field systems, currently the Hamiltonian Mean-Field model and the
