@@ -61,6 +61,10 @@ module FEL_module
      !> The y component of the field derivative. By(1) is the present step and the three
      !! other components are previous steps for the predictor-corrector algorithm.
      double precision :: By(4)
+     !> Entropy
+     double precision :: entropy
+     !> L2 norm
+     double precision :: L2
   end type FEL
   
 contains
@@ -175,42 +179,38 @@ contains
   !! @param this A type(FEL) variable.
   !! @param phys An array holding the observables.
   !! @param time The real-valued time. Is inserted with the observables in phys.
-  subroutine compute_phys(this, phys, time)
+  subroutine compute_phys(this)
     type(FEL), intent(inout) :: this
-    double precision, intent(out) :: phys(:)
-    double precision, intent(in) :: time
 
     integer :: i,m
-    double precision :: masse, L2, entropy, loopf
+    double precision :: loopf
 
-    masse = sum(this%V%rho)*this%V%dx
+    this%V%masse = sum(this%V%rho)*this%V%dx
     this%V%en_int = 2.d0*(this%Ax(1)*this%My + this%Ay(1)*this%Mx)
     this%V%en_kin = 0.d0
     this%V%momentum = 0.d0
-    entropy=0.d0
-    L2=0.d0
+    this%entropy=0.d0
+    this%L2=0.d0
     do i=1,this%V%Nx
        do m=1,this%V%Nv
           loopf = this%V%f(i,m)
           this%V%en_kin = this%V%en_kin + get_v(this%V,m)**2 * loopf
           this%V%momentum = this%V%momentum + get_v(this%V,m) * loopf
-          L2 = L2+loopf**2
+          this%L2 = this%L2+loopf**2
           loopf=loopf/this%f0
           if (loopf.gt.0.d0) then
-             entropy = entropy + loopf*log(loopf)
+             this%entropy = this%entropy + loopf*log(loopf)
           end if
           if (loopf.lt.1.d0) then
-             entropy = entropy + (1.d0-loopf)*log(1.d0-loopf)
+             this%entropy = this%entropy + (1.d0-loopf)*log(1.d0-loopf)
           end if
        end do
     end do
-    this%V%en_kin = this%V%en_kin * 0.5d0 * this%V%dx * this%V%dv
-    this%V%momentum = this%V%momentum     * this%V%dx * this%V%dv
-    entropy = -entropy              * this%V%dx * this%V%dv
-    L2           = L2               * this%V%dx * this%V%dv
-    this%V%energie = this%V%en_int + this%V%en_kin
-
-    phys = (/time, masse, this%V%energie, this%V%en_int, this%V%en_kin,this%V%momentum, this%I, this%phi, entropy, this%Ax(1), this%Ay(1), L2/)
+    this%V%en_kin   = this%V%en_kin * 0.5d0  * this%V%dx * this%V%dv
+    this%V%momentum = this%V%momentum        * this%V%dx * this%V%dv
+    this%entropy    = -this%entropy          * this%V%dx * this%V%dv
+    this%L2         = this%L2                * this%V%dx * this%V%dv
+    this%V%energie  = this%V%en_int + this%V%en_kin
 
   end subroutine compute_phys
 

@@ -21,21 +21,24 @@ program runFEL
   use FEL_module
   use ParseText
   use vmf90
+  use h5md
   implicit none
   
   type(FEL) :: F
   
   type(PTo) :: HCF
-  type(datafile_h5) :: h5fel
+  integer(HID_T) :: file_ID
+  type(h5md_t) :: mass_ID, energy_ID, int_ID, kin_ID, momentum_ID, I_ID, varphi_ID, &
+       entropy_ID, Ax_ID, Ay_ID, L2_ID
+  type(h5md_t) :: f_ID, rho_ID, phi_ID
 
   integer :: Nx, Nv
-  double precision :: width, bag, vmin, vmax, DT, x1, x2, x3, Mx, My, p0
-  integer :: i,m,t,t_top, n_images, t_images
+  double precision :: width, bag, vmin, vmax, DT, Mx, My, p0
+  integer :: t,t_top, n_images, t_images
   integer :: n_steps, n_top
+  double precision :: realtime
   
-  integer, parameter :: time_number = 12
-  double precision :: vals(time_number)
-  character(len=12) :: time_names(time_number), IC
+  character(len=12) :: IC
   
 ! Parse config file and create HMF and datafile data
 
@@ -80,31 +83,30 @@ program runFEL
      stop 'unknown IC'
   end if
 
-  call create_h5(h5fel, F%V, PTread_s(HCF,'out_file'), n_top, time_number)
-  call write_grid_info(h5fel, F%V, 'FEL')
-  call write_info_double_h5(h5fel,'delta',F%delta)
+  call h5open_f(h5_error)
 
-  time_names = (/'time    ', 'mass    ', 'energy  ', 'int     ', &
-                 'kin     ', 'momentum', 'I       ', 'phi     ', &
-                 'entropy ', 'Ax      ', 'Ay      ', 'L2      '/)
-  call write_info_string_array_h5(h5fel, 'time_names', time_names)
+  call h5md_create_file(file_ID, 'fel.h5', 'Pierre de Buyl <pdebuyl@ulb.ac.be>', 'vmf90_fel', 'No version information yet')
+
+  call write_grid_info(file_ID, F%V, 'FEL')
+  call h5md_write_par(file_ID,'delta',F%delta)
+
 
   call PTkill(HCF)
+
+  call begin_h5md
 
   t_top=0
 
   call compute_rho(F%V)
   call compute_M(F)
-  call compute_phys(F, vals, t_top*n_steps*DT)
-  call write_data_group_h5(h5fel, F%V, 0)
-  call write_time_slice_h5(h5fel, t_top, vals)
-
+  call compute_phys(F)
+  realtime = 0.d0
+  call write_obs
+  call write_fields
 
   do t_top = 1,n_top
 
-     call spline_x(F%V)
-     call advection_x_demi(F%V)
-     F%V%f = F%V%g
+     call advance_x(F%V, 0.5d0)
 
      call compute_rho(F%V)
      call compute_M(F)
@@ -115,13 +117,9 @@ program runFEL
         My = F%My
 
         call compute_force_A(F)
-        call spline_v(F%V)
-        call advection_v(F%V)
-        F%V%f = F%V%g
+        call advance_v(F%V, 0.5d0)
         
-        call spline_x(F%V)
-        call advection_x(F%V)
-        F%V%f = F%V%g
+        call advance_x(F%V, 1.d0)
 
         call compute_rho(F%V)
         call compute_M(F)
@@ -135,13 +133,11 @@ program runFEL
      My = F%My
 
      call compute_force_A(F)
-     call spline_v(F%V)
-     call advection_v(F%V)
-     F%V%f = F%V%g
+     call advance_v(F%V,1.d0)
 
-     call spline_x(F%V)
-     call advection_x_demi(F%V)
-     F%V%f = F%V%g
+     call advance_x(F%V, 0.5d0)
+
+     realtime = n_steps*DT*t_top
 
      call compute_rho(F%V)
      call compute_M(F)
@@ -152,16 +148,58 @@ program runFEL
      F%I = F%Ax(1)**2+F%Ay(1)**2
      F%phi = atan2(F%Ay(1),F%Ax(1))
 
-     call compute_phys(F, vals, t_top*n_steps*DT)
-     call write_time_slice_h5(h5fel, t_top, vals)
+     call compute_phys(F)
+     call write_obs
 
      if (t_top*n_images/n_top.ge.t_images) then
-        call write_data_group_h5(h5fel, F%V, t_top)
+        call compute_phi(F%V)
+        call write_fields
         t_images = t_images + 1
      end if
      
   end do
 
-  call close_h5(h5fel)
+  call h5close_f(h5_error)
+
+contains
+
+  subroutine begin_h5md
+    call h5md_create_obs(file_ID, 'mass', mass_ID, F%V%masse)
+    call h5md_create_obs(file_ID, 'energy', energy_ID, F%V%energie, link_from='mass')
+    call h5md_create_obs(file_ID, 'en_int', int_ID, F%V%en_int, link_from='mass')
+    call h5md_create_obs(file_ID, 'en_kin', kin_ID, F%V%en_kin, link_from='mass')
+    call h5md_create_obs(file_ID, 'momentum', momentum_ID, F%V%momentum, link_from='mass')
+    call h5md_create_obs(file_ID, 'I', I_ID, F%I, link_from='mass')
+    call h5md_create_obs(file_ID, 'phi', varphi_ID, F%phi, link_from='mass')
+    call h5md_create_obs(file_ID, 'entropy', entropy_ID, F%entropy, link_from='mass')
+    call h5md_create_obs(file_ID, 'Ax', Ax_ID, F%Ax(1), link_from='mass')
+    call h5md_create_obs(file_ID, 'Ay', Ay_ID, F%Ay(1), link_from='mass')
+    call h5md_create_obs(file_ID, 'L2', L2_ID, F%L2, link_from='mass')
+
+    call create_fields_group(file_ID)
+    call h5md_create_obs(file_ID, 'f', f_ID, F%V%f, override_obs='fields')
+    call h5md_create_obs(file_ID, 'rho', rho_ID, F%V%rho, link_from='f', override_obs='fields')
+    call h5md_create_obs(file_ID, 'phi', phi_ID, F%V%phi, link_from='f', override_obs='fields')
+  end subroutine begin_h5md
+
+  subroutine write_obs
+    call h5md_write_obs(mass_ID, F%V%masse, t_top, realtime)
+    call h5md_write_obs(energy_ID, F%V%energie, t_top, realtime)
+    call h5md_write_obs(int_ID, F%V%en_int, t_top, realtime)
+    call h5md_write_obs(kin_ID, F%V%en_kin, t_top, realtime)
+    call h5md_write_obs(momentum_ID, F%V%momentum, t_top, realtime)
+    call h5md_write_obs(I_ID, F%I, t_top, realtime)
+    call h5md_write_obs(varphi_ID, F%phi, t_top, realtime)
+    call h5md_write_obs(entropy_ID, F%entropy, t_top, realtime)
+    call h5md_write_obs(Ax_ID, F%Ax(1), t_top, realtime)
+    call h5md_write_obs(Ay_ID, F%Ay(1), t_top, realtime)
+    call h5md_write_obs(L2_ID, F%L2, t_top, realtime)
+  end subroutine write_obs
+
+  subroutine write_fields
+    call h5md_write_obs(f_ID, F%V%f, t_top, realtime)
+    call h5md_write_obs(rho_ID, F%V%rho, t_top, realtime)
+    call h5md_write_obs(phi_ID, F%V%phi, t_top, realtime)
+  end subroutine write_fields
 
 end program runFEL
