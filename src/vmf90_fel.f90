@@ -117,7 +117,7 @@ program runFEL
         My = F%My
 
         call compute_force_A(F)
-        call advance_v(F%V, 0.5d0)
+        call advance_v(F%V, 1.d0)
         
         call advance_x(F%V, 1.d0)
 
