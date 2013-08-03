@@ -231,7 +231,6 @@ contains
     call h5md_write_obs(My_ID, H%My, t_top, realtime)
     call h5md_write_obs(I2_ID, H%I2, t_top, realtime)
     call h5md_write_obs(I3_ID, H%I3, t_top, realtime)
-    !call h5md_write_obs(edf_ID, H%edf, t_top, realtime)
   end subroutine write_obs
 
   subroutine write_fields
