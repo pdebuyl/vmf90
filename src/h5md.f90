@@ -11,8 +11,18 @@ module h5md
   use hdf5
   implicit none
 
+  private
+  public :: h5_error, h5md_t, &
+       h5md_create_obs, h5md_write_obs, h5md_read_obs, &
+       h5md_write_par, h5md_read_par, &
+       h5md_create_file, h5md_open_file, h5md_create_trajectory_group, &
+       h5md_add_trajectory_data, h5md_set_box_size, h5md_open_trajectory, &
+       h5md_open_ID, h5md_close_ID
+
   !> Global variable to keep the error from HDF5 instructions.
   integer :: h5_error
+
+  integer, parameter :: H5S_UNLIMITED_KIND = kind(H5S_UNLIMITED_F)
 
   !> A type to hold an observable.
   !! Provides a buffering facility.
@@ -340,7 +350,8 @@ contains
        link_from, compress, force_kind, force_rank)
     integer(HID_T), intent(in) :: file_id
     character(len=*), intent(in) :: trajectory_name
-    integer, intent(in) :: N, D
+    integer(H5S_UNLIMITED_KIND), intent(in) :: N, D
+    integer(H5S_UNLIMITED_KIND), parameter :: ZERO = 0, ONE = 1
     type(h5md_t), intent(out) :: ID
     character(len=*), intent(in), optional :: group_name
     logical, intent(in), optional :: species_react
@@ -395,17 +406,17 @@ contains
        end if
     end if
     if (rank.eq.3) then
-       dims = (/ D, N, 0 /)
+       dims = (/ D, N, ZERO /)
        max_dims = (/ D, N, H5S_UNLIMITED_F /)
-       chunk_dims = (/ D, N, 1 /)
+       chunk_dims = (/ D, N, ONE /)
     else if (rank.eq.2) then
-       dims = (/ N, 0, 0 /)
-       max_dims = (/ N, H5S_UNLIMITED_F, 0 /)
-       chunk_dims = (/ N, 1, 0 /)
+       dims = (/ N, ZERO, ZERO /)
+       max_dims = (/ N, H5S_UNLIMITED_F, ZERO /)
+       chunk_dims = (/ N, ONE, ZERO /)
     else if (rank.eq.1) then
-       dims = (/ N, 0, 0 /)
-       max_dims = (/ N, 0, 0 /)
-       chunk_dims = (/ N, 0, 0 /)
+       dims = (/ N, ZERO, ZERO /)
+       max_dims = (/ N, ZERO, ZERO /)
+       chunk_dims = (/ N, ZERO, ZERO /)
     else
        write(*,*) 'the rank ', rank, ' is inappropriate in h5md_add_trajectory_data'
     end if
@@ -1368,9 +1379,6 @@ contains
     call h5gclose_f(g_id, h5_error)
 
   end subroutine h5md_create_obs_d4
-
-
-
 
   !> Takes a single value and appends it to the appropriate dataset.
   !! @param ID h5md_t variable.
