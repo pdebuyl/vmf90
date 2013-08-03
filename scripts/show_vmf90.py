@@ -65,6 +65,7 @@ if (cmd == 'plot'):
       print "variable %s not found" % (var,)
 
   if (n_plot>0):
+    plt.xlabel('time')
     plt.legend()
     do_show = True
   else:
