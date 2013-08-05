@@ -438,13 +438,14 @@ module Vlasov_module
     !> Initializes the distribution function with an homogeneous gaussian distribution.
     !!
     !! The function is \f$ f(\theta, v) = \sqrt{\frac{\beta}{2\pi}}
-    !! e^{-\beta \frac{v^2}{2}} \left(1+\epsilon\cos\theta\right) \f$ where
+    !! e^{-\beta \frac{(v-p_0)^2}{2}} \left(1+\epsilon\cos\theta\right) \f$ where
     !! \f$ \epsilon = 0 \f$ if unspecified. It represents a small pertubation to
     !! test stability properties.
     !!
     !! @param this A type(grid) variable.
     !! @param beta The inverse temperature of the distribution.
     !! @param epsilon The amplitude of the sinusoidal perturbation.
+    !! @param p0 Shift of the gaussian in the v-direction.
    subroutine init_gaussian(this, beta, epsilon, p0)
       type(grid), intent(inout) :: this
       double precision, intent(in) :: beta
