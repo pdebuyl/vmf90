@@ -4,6 +4,8 @@ Configuration files syntax {#config_file_syntax}
 The vmf90 programs vmf90_hmf and vmf90_fel read the parameters for a simulation
 in the files HMF_in and FEL_in, respectively.
 
+Example parameter files are found in the ``scripts`` directory.
+
 General syntax
 --------------
 
@@ -50,7 +52,26 @@ Parameters common to all vmf90 are requested to setup the simulation:
 vmf90_hmf syntax
 ----------------
 
-vmf90_hmf supports the following extra options.
+vmf90_hmf supports the following extra options:
 
 ``Nedf``
     Number of data points for storing the energy distribution function.
+
+``Hfield``
+    For fixed-field simulations, the value of the field.
+
+Initial conditions for vmf90_hmf
+--------------------------------
+
+A waterbag. Calls \ref vlasov_module::init_carre
+
+    IC = waterbag
+    width = angular half width
+    bag = velocity half width
+
+A waterbag with a cosine perturbation. Calls \ref vlasov_module::init_carre
+
+    IC = wb_eps
+    width = angular half width
+    bag = velocity half width
+    epsilon = small perturbation
