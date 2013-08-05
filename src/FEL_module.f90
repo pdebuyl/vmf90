@@ -177,8 +177,6 @@ contains
   !> Computes the macroscopic observables.
   !!
   !! @param this A type(FEL) variable.
-  !! @param phys An array holding the observables.
-  !! @param time The real-valued time. Is inserted with the observables in phys.
   subroutine compute_phys(this)
     type(FEL), intent(inout) :: this
 
