@@ -1,4 +1,3 @@
-out_file = fel.h5            ! filename for output data
 Nx = 256                     ! number of points in x-direction
 Nv = 384                     ! number of points in v-direction
 vmin = -4.                   ! upper limit of the box in the v-direction

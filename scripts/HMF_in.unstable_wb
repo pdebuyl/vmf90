@@ -1,5 +1,4 @@
 model = HMF                  ! the model name. is checked in the program 
-out_file = hmf.h5            ! filename for output data 
 Nx = 256                     ! number of points in x-direction 
 Nv = 512                     ! number of points in v-direction
 vmax = 2.5                   ! size of the box
