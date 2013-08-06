@@ -41,8 +41,9 @@ vmf90_ab: h5md.o spline_module.o Vlasov_module.o AB_module.o ParseText.o vmf90_v
 	$(F90) h5md.o spline_module.o Vlasov_module.o AB_module.o ParseText.o vmf90.o vmf90_ab.o -o vmf90_ab
 
 clean:
-	rm -f h5md.o spline_module.o Vlasov_module.o HMF_module.o AB_module.o ParseText.o vmf90.o FEL_module.o \
+	rm -f spline_module.o Vlasov_module.o HMF_module.o AB_module.o ParseText.o vmf90.o FEL_module.o \
 	vmf90_hmf.o vmf90_fel.o vmf90_ab.o \
 	spline_module.mod vlasov_module.mod parsetext.mod vmf90.mod vmf90.mod \
 	hmf_module.mod fel_module.mod ab_module.mod \
-	vmf90_version.h vmf90_hmf vmf90_fel
+	vmf90_version.h vmf90_hmf vmf90_fel \
+	h5md.o h5md.mod
