@@ -51,7 +51,7 @@ vmax = a['parameters']['vmax'].value
 extent = [xmin,xmax,vmin,vmax]
 
 plt.rc('figure.subplot', left = 0.17)
-f = plt.figure(figsize=[10.,5.2])
+f = plt.figure(figsize=[8.,4.5])
 
 do_show = False
 
@@ -73,11 +73,12 @@ if (cmd == 'plot'):
 
 elif (cmd == 'snaps'):
   n = a['fields']['f']['value'].shape[0]
-  for i in range(3):
-    plt.subplot(1,3,i+1)
-    plt.imshow(a['fields']['f']['value'][i*n/3],origin='lower',vmin=0.,extent=extent)
-    plt.xlabel(r'$x$')
-    plt.ylabel(r'$v$')
+  for i in range(4):
+    plt.subplot(2,2,i+1)
+    plt.imshow(a['fields']['f']['value'][i*n/4],origin='lower',vmin=0.,extent=extent)
+    plt.text(.05,.8,r'$t='+"%.2f" % (a['fields']['f']['time'][i*n/4],)+r'$',transform = plt.gca().transAxes, color='white')
+    if i>1: plt.xlabel(r'$x$')
+    if i%2==0: plt.ylabel(r'$v$')
   do_show = True
 
 elif (cmd == 'dump'):
