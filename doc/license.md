@@ -1,0 +1,5 @@
+LICENSE {#license}
+=======
+
+\verbinclude LICENSE
+
