@@ -46,7 +46,7 @@ contains
     character(len=80) :: vmf90_version
 
     if ( trim(adjustl(git_status)).eq.'Clean' ) then
-       vmf90_version = trim(adjustl(git_describe))//trim(adjustl(git_sha1))
+       vmf90_version = trim(adjustl(git_describe))//' SHA1 '//trim(adjustl(git_sha1))
     else
        vmf90_version = 'Unclean based on '//trim(adjustl(git_describe))
     end if
