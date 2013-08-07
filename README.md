@@ -70,16 +70,11 @@ A doxygen-generated documentation is readily available by executing:
 from the main directory of vmf90. The index of the documentation is found at
 ``doc/html/index.html``.
 
-This README file is reStructuredText and can be converted to html, for instance,
-with the rst2html command-line tool:
-
-    rst2html README > README.html
-
 Appropriate references to the algorithms are given in the documentation, as well
 as a full API documentation for the code and the Fortran modules.
 
 Appropriate citation is appreciated in any scientific publication that makes use
-of this software. The latest citation suggestion is ::
+of this software. The latest citation suggestion is:
 
 * P. de Buyl, "vmf90 - A Vlasov solver for mean-field systems in Fortran 90"
     http://homepages.ulb.ac.be/~pdebuyl/vmf90/.
