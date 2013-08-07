@@ -28,8 +28,8 @@ sed -i -e "s/GIT_SHA1/${GIT_SHA1}/g" vmf90_version.h.temp
 # Set git_describe
 GIT_DESCRIBE=`git describe`
 GIT_DATE=`git log -n1 --format=%aD`
-GIT_DESCRIBE="${GIT_DESCRIBE} \/ ${GIT_DATE}"
 sed -i -e "s/GIT_DESCRIBE/${GIT_DESCRIBE}/g" vmf90_version.h.temp
+sed -i -e "s/GIT_DATE/${GIT_DATE}/g" vmf90_version.h.temp
 # If there is already a file vmf90_version.h, replace it only if the newly
 # generated file is different, to prevent the triggering of the makefile rule
 if [ -r vmf90_version.h ]

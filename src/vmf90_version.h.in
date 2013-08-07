@@ -1,3 +1,4 @@
     character(len=80), parameter :: git_sha1 = 'GIT_SHA1'
     character(len=80), parameter :: git_describe = 'GIT_DESCRIBE'
+    character(len=80), parameter :: git_date = 'GIT_DATE'
     character(len=80), parameter :: git_status = 'GIT_STATUS'

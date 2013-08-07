@@ -32,10 +32,11 @@ contains
     implicit none
     
     write(*,*) 'vmf90> vmf90 software'
-    write(*,*) 'vmf90> (C) 2009-2011 P. de Buyl'
-    write(*,*) 'vmf90> Version/date : ', trim(adjustl(git_describe))
-    write(*,*) 'vmf90> git commit   : ', trim(adjustl(git_sha1))
-    write(*,*) 'vmf90> git status   : ', trim(adjustl(git_status))
+    write(*,*) 'vmf90> (C) 2009-2013 P. de Buyl'
+    write(*,*) 'vmf90> Version    : ', trim(adjustl(git_describe))
+    write(*,*) 'vmf90> Date       : ', trim(adjustl(git_date))
+    write(*,*) 'vmf90> git commit : ', trim(adjustl(git_sha1))
+    write(*,*) 'vmf90> git status : ', trim(adjustl(git_status))
 
   end subroutine vmf90_info
 
