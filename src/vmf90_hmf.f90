@@ -60,7 +60,7 @@ program runHMF
   call newHMF(H,Nx,Nv,vmax, Nedf=PTread_i(HCF,'Nedf'), model=PTread_s(HCF, 'model'), Hfield=PTread_d(HCF,'Hfield') )
   H%V%DT = DT
 
-  call h5md_create_file(file_ID, 'hmf.h5', 'Pierre de Buyl <pdebuyl@ulb.ac.be>', 'vmf90_hmf', 'No version information yet')
+  call h5md_create_file(file_ID, 'hmf.h5', 'Pierre de Buyl <pdebuyl@ulb.ac.be>', 'vmf90_hmf', trim(vmf90_version()))
 
   call vmf90_info()
   write(*,*) 'Running HMF with ', Nx, 'x', Nv,  'points'

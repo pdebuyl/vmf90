@@ -18,12 +18,18 @@
 !> This module provides information on the package version.
 module vmf90
   implicit none
+
+  private
+
+  public :: vmf90_version, vmf90_info
+
+  include 'vmf90_version.h'
+
 contains
   
   !> Prints version information about the vmf90 package.
   subroutine vmf90_info()
     implicit none
-    include 'vmf90_version.h'
     
     write(*,*) 'vmf90> vmf90 software'
     write(*,*) 'vmf90> (C) 2009-2011 P. de Buyl'
@@ -32,5 +38,18 @@ contains
     write(*,*) 'vmf90> git status   : ', trim(adjustl(git_status))
 
   end subroutine vmf90_info
+
+  !> Returns version information about the vmf90 package.
+  function vmf90_version()
+    implicit none
+    character(len=80) :: vmf90_version
+
+    if ( trim(adjustl(git_status)).eq.'Clean' ) then
+       vmf90_version = trim(adjustl(git_describe))//trim(adjustl(git_sha1))
+    else
+       vmf90_version = 'Unclean based on '//trim(adjustl(git_describe))
+    end if
+
+  end function vmf90_version
 
 end module vmf90
