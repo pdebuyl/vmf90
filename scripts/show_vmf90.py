@@ -75,7 +75,7 @@ elif (cmd == 'snaps'):
   n = a['fields']['f']['value'].shape[0]
   for i in range(4):
     plt.subplot(2,2,i+1)
-    plt.imshow(a['fields']['f']['value'][i*n/4],origin='lower',vmin=0.,extent=extent)
+    plt.imshow(a['fields']['f']['value'][i*n/4],origin='lower',vmin=0.,extent=extent, aspect='auto')
     plt.text(.05,.8,r'$t='+"%.2f" % (a['fields']['f']['time'][i*n/4],)+r'$',transform = plt.gca().transAxes, color='white')
     if i>1: plt.xlabel(r'$x$')
     if i%2==0: plt.ylabel(r'$v$')
