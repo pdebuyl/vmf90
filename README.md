@@ -59,6 +59,9 @@ Usage
 
     ../scripts/show_vmf90.py hmf.h5 plot energy en_int kin_kin
 
+To use the FEL program, the instructions are similar but "make hmf" becomes
+"make fel". Also, the program for the FEL is vmf90_fel and the parameters file
+for the FEL program is FEL_in.
 
 Documentation
 -------------
