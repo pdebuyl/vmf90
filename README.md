@@ -57,7 +57,7 @@ Usage
    directory. To display the total energy and the interaction and kinetic parts,
    issue the following command (NumPy, h5py and Matplotlib are required):
 
-    ../scripts/show_vmf90.py hmf.h5 plot energy int kin
+    ../scripts/show_vmf90.py hmf.h5 plot energy en_int kin_kin
 
 
 Documentation
