@@ -46,8 +46,7 @@ Usage
    simulation. Examples are found in the ``examples`` directory. To copy one of
    these examples, type:
 
-    cp ../scripts/HMF_in.resonances  
-    ./HMF_in
+    cp ../scripts/HMF_in.resonances ./HMF_in
 
 7. A run is performed by executing ``vmf90_hmf``:
 
@@ -58,7 +57,7 @@ Usage
    directory. To display the total energy and the interaction and kinetic parts,
    issue the following command (NumPy, h5py and Matplotlib are required):
 
-    ../scripts/show_vmf90.py hmf.h5 plot energy en_int kin_kin
+    ../scripts/show_vmf90.py hmf.h5 plot energy en_int en_kin
 
 To use the FEL program, the instructions are similar but "make hmf" becomes
 "make fel". Also, the program for the FEL is vmf90_fel and the parameters file
