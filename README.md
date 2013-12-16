@@ -33,7 +33,7 @@ Usage
    up.
 2. Create a build directory and copy the Makefile:
 
-    mkdir build && cd build
+    mkdir build && cd build  
     cp ../scripts/Makefile ./
 
 3. Eventually, edit the ``Makefile`` to adapt to your compiler.
@@ -46,7 +46,8 @@ Usage
    simulation. Examples are found in the ``examples`` directory. To copy one of
    these examples, type:
 
-    cp ../scripts/HMF_in.resonances ./HMF_in
+    cp ../scripts/HMF_in.resonances  
+    ./HMF_in
 
 7. A run is performed by executing ``vmf90_hmf``:
 
