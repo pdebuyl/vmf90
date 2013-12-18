@@ -29,5 +29,5 @@ echo "    character(len=80), parameter :: git_status = 'Out of repository'" >> v
 mkdir vmf90/scripts
 sed -e '/TOREMOVE/d' scripts/Makefile > vmf90/scripts/Makefile
 tar cf TMP.tar vmf90
-tar -f ../vmf90-${VMF90_VERSION}.tar --concatenate --update TMP.tar
+tar -f ../vmf90-${VMF90_VERSION}.tar --update TMP.tar
 rm -rf vmf90 TMP.tar
