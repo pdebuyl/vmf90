@@ -1,3 +1,2 @@
-src/vmf90_version.h.in export-ignore 
 .gitignore export-ignore
 .gitattributes export-ignore
