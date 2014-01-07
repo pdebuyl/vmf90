@@ -43,7 +43,7 @@ Usage
 
 5. The build directory now contains an executable ``vmf90_hmf``.
 6. A ``HMF_in`` configuration file is required to set up the
-   simulation. Examples are found in the ``examples`` directory. To copy one of
+   simulation. Examples are found in the ``scripts`` directory. To copy one of
    these examples, type:
 
     cp ../scripts/HMF_in.resonances ./HMF_in
