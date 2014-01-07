@@ -35,9 +35,9 @@ then
     sed -i -e "s/GIT_DATE/${GIT_DATE}/g" vmf90_version.h.temp
 else
     # Check for vmf90_version.h.dist
-    if [ -r vmf90_version.h.dist ]
+    if [ -r ../src/vmf90_version.h.dist ]
     then
-	GIT_DESCRIBE=`cat vmf90_version.h.dist`
+	GIT_DESCRIBE=`cat ../src/vmf90_version.h.dist`
     else
 	GIT_DESCRIBE="Out of repository"
     fi
