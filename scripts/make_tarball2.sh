@@ -22,6 +22,5 @@ VMF90_VERSION=`git describe`
 git archive --prefix=vmf90/ -o ../vmf90-${VMF90_VERSION}.tar HEAD
 mkdir -p vmf90/src
 echo $VMF90_VERSION > vmf90/src/vmf90_version.h.dist
-tar cf TMP.tar vmf90
 tar -f ../vmf90-${VMF90_VERSION}.tar --update vmf90/
-rm -rf vmf90 TMP.tar
+rm -rf vmf90
