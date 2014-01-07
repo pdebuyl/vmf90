@@ -21,13 +21,6 @@
 VMF90_VERSION=`git describe`
 git archive --prefix=vmf90/ -o ../vmf90-${VMF90_VERSION}.tar HEAD
 mkdir -p vmf90/src
-mv src/vmf90_version.h vmf90/src
-sed -i -e '/git_sha1/d' vmf90/src/vmf90_version.h
-sed -i -e '/git_status/d' vmf90/src/vmf90_version.h
-echo "    character(len=80), parameter :: git_sha1 = 'Out of repository'" >> vmf90/src/vmf90_version.h
-echo "    character(len=80), parameter :: git_status = 'Out of repository'" >> vmf90/src/vmf90_version.h
-mkdir vmf90/scripts
-sed -e '/TOREMOVE/d' scripts/Makefile > vmf90/scripts/Makefile
-tar cf TMP.tar vmf90
+echo $VMF90_VERSION > vmf90/src/vmf90_version.h.dist
 tar -f ../vmf90-${VMF90_VERSION}.tar --update vmf90/
-rm -rf vmf90 TMP.tar
+rm -rf vmf90
