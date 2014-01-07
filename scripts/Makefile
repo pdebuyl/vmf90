@@ -21,9 +21,9 @@ all : hmf fel
 hmf: vmf90_hmf
 fel: vmf90_fel
 
-vmf90_version.h: vmf90_version.h.in FORCE    # TOREMOVE
-	../scripts/make_version.sh           # TOREMOVE
-FORCE:                                       # TOREMOVE
+vmf90_version.h: vmf90_version.h.in FORCE
+	../scripts/make_version.sh
+FORCE:
 
 vmf90.o: vmf90.f90 vmf90_version.h
 	$(F90) -c $<
