@@ -1,17 +1,25 @@
 vmf90 : Vlasov solver for mean-field systems in Fortran 90
 ==========================================================
 
-Copyright © 2009-2013 Pierre de Buyl
+Copyright © 2009-2014 Pierre de Buyl
 
 vmf90 is a software for the numerical resolution of the Vlasov equation for 
 mean-field systems, currently the Hamiltonian Mean-Field model and the
 Colson-Bonifacio model for the free electron laser. vmf90 is based
 on the semi-Lagrangian method with cubic spline interpolation.
 
-vmf90 is developed by Pierre de Buyl and is available under the GNU General 
-Public License http://www.gnu.org/licenses/gpl.html . The GNU General Public
-License is found in the file LICENSE. The homepage for vmf90 is
-http://homepages.ulb.ac.be/~pdebuyl/vmf90/ .
+vmf90 is developed by Pierre de Buyl and is available under the [GNU General 
+Public License](http://www.gnu.org/licenses/gpl.html).
+The GNU General Public License is found in the file LICENSE.
+The homepage for vmf90 is <https://github.com/pdebuyl/vmf90>.
+
+vmf90 is presented in P. de Buyl, [The vmf90 program for the numerical
+resolution of the Vlasov equation for mean-field systems
+](http://dx.doi.org/10.1016/j.cpc.2014.03.004), Comp. Phys. Comm. (2014)
+- [[arXiv.org:1310.0805]](http://arxiv.org/abs/1310.0805).
+Citations to this reference are recommended and appreciated if you use vmf90 to
+obtain scientific results.
+
 
 Requirements
 ------------
@@ -75,15 +83,4 @@ from the main directory of vmf90. The index of the documentation is found at
 
 Appropriate references to the algorithms are given in the documentation, as well
 as a full API documentation for the code and the Fortran modules.
-
-Appropriate citation is appreciated in any scientific publication that makes use
-of this software. The latest citation suggestion is:
-
-* P. de Buyl, "vmf90 - A Vlasov solver for mean-field systems in Fortran 90"
-    http://homepages.ulb.ac.be/~pdebuyl/vmf90/.
-* P. de Buyl, "Numerical resolution of the Vlasov equation for the Hamiltonian
-    Mean-Field model", Commun. Nonlinear Sci. Numer. Simulat. vol. 15,
-    pp. 2133-2139 (2010).
-
-Please check the vmf90 homepage to see if a more recent reference is appropriate.
 
