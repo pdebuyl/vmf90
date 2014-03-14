@@ -1,7 +1,7 @@
 vmf90 documentation {#mainpage}
 ===================
 
-Copyright (C) 2009-2013 Pierre de Buyl
+Copyright (C) 2009-2014 Pierre de Buyl
 
 Welcome to the documentation of vmf90!
 
@@ -12,7 +12,7 @@ vmf90 is available under the GNU General Public License
 http://www.gnu.org/licenses/gpl.html . The GNU General Public License is found
 in the file LICENSE.
 
-The homepage of vmf90 is found at <a href="http://homepages.ulb.ac.be/~pdebuyl/vmf90/">http://homepages.ulb.ac.be/~pdebuyl/vmf90/</a>.
+The homepage of vmf90 is found at <a href="https://github.com/pdebuyl/vmf90">https://github.com/pdebuyl/vmf90</a>.
 
 This documentation contains:
 - The full commented API (see tabs at the top of the page.)
