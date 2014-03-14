@@ -17,6 +17,13 @@
 # You should have received a copy of the GNU General Public License
 # along with vmf90.  If not, see <http://www.gnu.org/licenses/>.
 
+# If by error a "vmf90_version.h" file is in "../src", it will be included
+if [ -r ../src/vmf90_version.h ]
+then
+    echo "Removing src/vmf90_version.h"
+    rm ../src/vmf90_version.h
+fi
+
 # Check whether we are in a git repository.
 if [ "`git rev-parse --is-inside-work-tree 2>/dev/null`" = "true" ]
 then
