@@ -15,8 +15,8 @@ The homepage for vmf90 is <https://github.com/pdebuyl/vmf90>.
 
 vmf90 is presented in P. de Buyl, [The vmf90 program for the numerical
 resolution of the Vlasov equation for mean-field systems
-](http://dx.doi.org/10.1016/j.cpc.2014.03.004), Comp. Phys. Comm. (2014)
-- [[arXiv.org:1310.0805]](http://arxiv.org/abs/1310.0805).
+](http://dx.doi.org/10.1016/j.cpc.2014.03.004), Comp. Phys. Comm. (2014) -
+[[arXiv.org:1310.0805]](http://arxiv.org/abs/1310.0805).
 Citations to this reference are recommended and appreciated if you use vmf90 to
 obtain scientific results.
 
