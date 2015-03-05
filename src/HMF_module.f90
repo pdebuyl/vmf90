@@ -63,6 +63,8 @@ module HMF_module
      double precision :: I2
      !> I3
      double precision :: I3
+     !> Moments of p
+     double precision, allocatable :: pn(:)
   end type HMF
   
 contains
@@ -78,7 +80,8 @@ contains
   !! @param model Textual declaration of the model.
   !! @param epsilon Coupling parameter.
   !! @param Hfield External field.
-  subroutine newHMF(this,Nx,Nv,vmax,vmin, Nedf, model, epsilon, Hfield)
+  !! @param n_moments number of moments of p to compute
+  subroutine newHMF(this,Nx,Nv,vmax,vmin, Nedf, model, epsilon, Hfield, n_moments)
     type(HMF), intent(out) :: this
     integer, intent(in) :: Nx, Nv
     double precision, intent(in) :: vmax
@@ -86,6 +89,7 @@ contains
     integer, intent(in), optional :: Nedf
     character(len=12), optional, intent(in) :: model
     double precision, optional, intent(in) :: epsilon, Hfield
+    integer, optional, intent(in) :: n_moments
     double precision :: vmin_final
 
     if (present(vmin)) then
@@ -122,6 +126,13 @@ contains
           this%Hfield = 0.d0
        end if
 
+    end if
+
+    if (present(n_moments)) then
+       if (n_moments .gt. 0) then
+          allocate(this%pn(n_moments))
+          this%pn = 0.d0
+       end if
     end if
 
   end subroutine newHMF
@@ -176,6 +187,16 @@ contains
 
     integer :: i,m
     double precision :: loopf
+    integer :: n, n_moments
+    logical :: do_pn
+
+    if (allocated(this%pn)) then
+       this%pn = 0.d0
+       do_pn = .true.
+       n_moments = size(this%pn)
+    else
+       do_pn = .false.
+    end if
 
     if (this%is_ext) then
        this%V%en_int= this%epsilon * 0.5d0 * (1.d0 - this%Mx**2 - this%My**2) + this%Hfield*(1-this%Mx)
@@ -193,6 +214,11 @@ contains
           this%V%momentum = this%V%momentum + get_v(this%V,m) * loopf
           this%I2 = this%I2 + loopf**2
           this%I3 = this%I3 + loopf**3
+          if (do_pn) then
+             do n=1,n_moments
+                this%pn(n) = this%pn(n) + (get_v(this%V, m)**n) * loopf
+             end do
+          end if
           if (loopf.gt.0.d0 .and. loopf.lt.this%f0) then
              loopf = loopf/this%f0
              this%entropy = this%entropy + loopf*log(loopf) + (1.d0-loopf)*log(1.d0-loopf)
@@ -207,6 +233,11 @@ contains
     this%I3  = this%I3                   * this%V%dx * this%V%dv
     this%entropy  = this%entropy         * this%V%dx * this%V%dv
     this%V%energie = this%V%en_int + this%V%en_kin
+    if (do_pn) then
+       do n=1,n_moments
+          this%pn(n) = this%pn(n) * this%V%dx * this%V%dv
+       end do
+    end if
 
   end subroutine compute_phys
 
