@@ -1,0 +1,32 @@
+
+M0=0.100
+U=0.800
+SIMDIR=HMF_M0$(M0)_U$(U)
+
+VMF90=.
+VMF90_HMF=$(VMF90)/build/vmf90_hmf
+
+all: $(SIMDIR)/hmf.h5
+
+WB_ARGS=
+ifneq ($(origin N_TOP), undefined)
+WB_ARGS += --n-top $(N_TOP)
+endif
+ifneq ($(origin NX), undefined)
+WB_ARGS += --nx $(NX)
+endif
+ifneq ($(origin NV), undefined)
+WB_ARGS += --nv $(NV)
+endif
+ifneq ($(origin N_MOMENTS), undefined)
+WB_ARGS += --n-moments $(N_MOMENTS)
+endif
+
+$(SIMDIR):
+	mkdir $@
+
+$(SIMDIR)/HMF_in: $(VMF90)/scripts/waterbag.py | $(SIMDIR)
+	python $< $(M0) $(U) $(WB_ARGS) > $@
+
+$(SIMDIR)/hmf.h5: $(SIMDIR)/HMF_in
+	(cd $(SIMDIR) ; $(VMF90_HMF) )
