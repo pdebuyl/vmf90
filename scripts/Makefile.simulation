@@ -28,5 +28,5 @@ $(SIMDIR):
 $(SIMDIR)/HMF_in: $(VMF90)/scripts/waterbag.py | $(SIMDIR)
 	python $< $(M0) $(U) $(WB_ARGS) > $@
 
-$(SIMDIR)/hmf.h5: $(SIMDIR)/HMF_in
-	(cd $(SIMDIR) ; $(VMF90_HMF) )
+$(SIMDIR)/hmf.h5: $(VMF90_HMF) $(SIMDIR)/HMF_in
+	(cd $(SIMDIR) ; $< )
