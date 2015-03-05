@@ -181,6 +181,7 @@ program runHMF
      call compute_force(H)
      call advance_v(H%V, 1.d0)
      call advance_x(H%V, 0.5d0)
+     realtime = realtime + DT
 
      call compute_rho(H%V)
      call compute_M(H)
