@@ -71,7 +71,7 @@ Documentation
 
 A doxygen-generated documentation is readily available by executing:
 
-    doxygen doc/doxy_conf
+    make doc
 
 from the main directory of vmf90. The index of the documentation is found at
 ``doc/html/index.html``.

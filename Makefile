@@ -27,3 +27,7 @@ fel: | build
 clean:
 	make -C build -f ../scripts/Makefile $@
 
+doc:
+	(cd doc ; doxygen doxy_conf)
+
+.PHONY: doc
