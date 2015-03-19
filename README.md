@@ -13,10 +13,10 @@ Public License](http://www.gnu.org/licenses/gpl.html).
 The GNU General Public License is found in the file LICENSE.
 The homepage for vmf90 is <https://github.com/pdebuyl/vmf90>.
 
-vmf90 is presented in P. de Buyl, [The vmf90 program for the numerical
-resolution of the Vlasov equation for mean-field systems
-](http://dx.doi.org/10.1016/j.cpc.2014.03.004), Comp. Phys. Comm. (2014) -
-[[arXiv.org:1310.0805]](http://arxiv.org/abs/1310.0805).
+vmf90 is presented in P. de Buyl,
+[The vmf90 program for the numerical resolution of the Vlasov equation for mean-field systems ](http://dx.doi.org/10.1016/j.cpc.2014.03.004),
+Comp. Phys. Comm. (2014) **185**, 1822–1827 -
+[[arXiv:1310.0805]](http://arxiv.org/abs/1310.0805).
 Citations to this reference are recommended and appreciated if you use vmf90 to
 obtain scientific results.
 
@@ -41,26 +41,26 @@ Usage
    up.
 2. Run the make command with the argument ``hmf``:
 
-    make hmf
+       make hmf
 
 3. The build directory now contains an executable ``vmf90_hmf``.
 4. A ``HMF_in`` configuration file is required to set up the
    simulation. Examples are found in the ``scripts`` directory. To copy one of
    these examples, type:
 
-    cd build
-    cp ../scripts/HMF_in.resonances ./HMF_in
+       cd build
+       cp ../scripts/HMF_in.resonances ./HMF_in
 
 7. A run is performed by executing ``vmf90_hmf``:
 
-    ./vmf90_hmf
+       ./vmf90_hmf
 
 8. After a run is completed, the data is found in the file ``hmf.h5``. Examples
    scripts on how to read these files in Python are found in the ``scripts``
    directory. To display the total energy and the interaction and kinetic parts,
    issue the following command (NumPy, h5py and Matplotlib are required):
 
-    ../scripts/show_vmf90.py hmf.h5 plot energy en_int en_kin
+       ../scripts/show_vmf90.py hmf.h5 plot energy en_int en_kin
 
 To use the FEL program, the instructions are similar but "make hmf" becomes
 "make fel". Also, the program for the FEL is vmf90_fel and the parameters file
