@@ -21,6 +21,9 @@ endif
 ifneq ($(origin N_MOMENTS), undefined)
 WB_ARGS += --n-moments $(N_MOMENTS)
 endif
+ifneq ($(origin N_IMAGES), undefined)
+WB_ARGS += --n-images $(N_IMAGES)
+endif
 
 $(SIMDIR):
 	mkdir $@

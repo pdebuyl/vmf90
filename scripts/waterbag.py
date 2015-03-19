@@ -29,6 +29,7 @@ parser.add_argument('U', type=float)
 parser.add_argument('--nx', type=int, default=256)
 parser.add_argument('--nv', type=int, default=256)
 parser.add_argument('--n-moments', type=int, default=0)
+parser.add_argument('--n-images', type=int, default=10)
 parser.add_argument('--n-top', type=int, default=100)
 args = parser.parse_args()
 
@@ -62,7 +63,7 @@ vmax = 3.
 DT = 0.1
 n_steps = 5
 n_top = {n_top}
-n_images = 5
+n_images = {n_images}
 IC = waterbag
 width = {Dth}
 bag = {Dp}
