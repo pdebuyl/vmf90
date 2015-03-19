@@ -3,8 +3,9 @@ M0=0.100
 U=0.800
 SIMDIR=HMF_M0$(M0)_U$(U)
 
-VMF90=.
-VMF90_HMF=$(VMF90)/build/vmf90_hmf
+VMF90 ?= $(PWD)
+VMF90 := $(VMF90)
+VMF90_HMF = $(VMF90)/build/vmf90_hmf
 
 all: $(SIMDIR)/hmf.h5
 
@@ -24,6 +25,10 @@ endif
 ifneq ($(origin N_IMAGES), undefined)
 WB_ARGS += --n-images $(N_IMAGES)
 endif
+
+variables:
+	@echo VMF90 $(VMF90)
+	@echo SIMDIR $(SIMDIR)
 
 $(SIMDIR):
 	mkdir $@
