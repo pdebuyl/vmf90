@@ -1,7 +1,7 @@
 vmf90 documentation {#mainpage}
 ===================
 
-Copyright (C) 2009-2014 Pierre de Buyl
+Copyright (C) 2009-2015 Pierre de Buyl
 
 Welcome to the documentation of vmf90!
 

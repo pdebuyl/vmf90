@@ -1,4 +1,4 @@
-! Copyright (C) 2009-2011 Pierre de Buyl
+! Copyright (C) 2009-2015 Pierre de Buyl
 
 ! This file is part of vmf90
 

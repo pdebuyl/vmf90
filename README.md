@@ -1,7 +1,7 @@
 vmf90 : Vlasov solver for mean-field systems in Fortran 90
 ==========================================================
 
-Copyright © 2009-2014 Pierre de Buyl
+Copyright © 2009-2015 Pierre de Buyl
 
 vmf90 is a software for the numerical resolution of the Vlasov equation for 
 mean-field systems, currently the Hamiltonian Mean-Field model and the
@@ -39,21 +39,16 @@ Usage
 
 1. Make sure that the ``h5fc`` Fortran compiler script for HDF5 is properly set
    up.
-2. Create a build directory and copy the Makefile:
-
-    mkdir build && cd build  
-    cp ../scripts/Makefile ./
-
-3. Eventually, edit the ``Makefile`` to adapt to your compiler.
-4. Run the make command with the argument ``hmf``:
+2. Run the make command with the argument ``hmf``:
 
     make hmf
 
-5. The build directory now contains an executable ``vmf90_hmf``.
-6. A ``HMF_in`` configuration file is required to set up the
+3. The build directory now contains an executable ``vmf90_hmf``.
+4. A ``HMF_in`` configuration file is required to set up the
    simulation. Examples are found in the ``scripts`` directory. To copy one of
    these examples, type:
 
+    cd build
     cp ../scripts/HMF_in.resonances ./HMF_in
 
 7. A run is performed by executing ``vmf90_hmf``:

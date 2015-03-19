@@ -1,4 +1,4 @@
-! Copyright (C) 2009-2011 Pierre de Buyl
+! Copyright (C) 2009-2015 Pierre de Buyl
 
 ! This file is part of vmf90
 
@@ -32,7 +32,7 @@ contains
     implicit none
     
     write(*,*) 'vmf90> vmf90 software'
-    write(*,*) 'vmf90> (C) 2009-2013 P. de Buyl'
+    write(*,*) 'vmf90> (C) 2009-2015 P. de Buyl'
     write(*,*) 'vmf90> Version    : ', trim(adjustl(git_describe))
     write(*,*) 'vmf90> Date       : ', trim(adjustl(git_date))
     write(*,*) 'vmf90> git commit : ', trim(adjustl(git_sha1))
