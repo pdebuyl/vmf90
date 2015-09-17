@@ -17,5 +17,5 @@ The homepage of vmf90 is found at <a href="https://github.com/pdebuyl/vmf90">htt
 This documentation contains:
 - The full commented API (see tabs at the top of the page.)
 - The [syntax](\ref config_file_syntax) for the configuration files.
-- The [README](\ref md_README) file of the project.
+- The [README](\ref README) file of the project.
 - The [LICENSE](\ref license) file of the project.
