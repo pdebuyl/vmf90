@@ -65,6 +65,8 @@ module HMF_module
      double precision :: I3
      !> Moments of p
      double precision, allocatable :: pn(:)
+     !> Moments of e
+     double precision, allocatable :: hn(:)
   end type HMF
   
 contains
@@ -81,7 +83,7 @@ contains
   !! @param epsilon Coupling parameter.
   !! @param Hfield External field.
   !! @param n_moments number of moments of p to compute
-  subroutine newHMF(this,Nx,Nv,vmax,vmin, Nedf, model, epsilon, Hfield, n_moments)
+  subroutine newHMF(this,Nx,Nv,vmax,vmin, Nedf, model, epsilon, Hfield, n_pmoments, n_hmoments)
     type(HMF), intent(out) :: this
     integer, intent(in) :: Nx, Nv
     double precision, intent(in) :: vmax
@@ -89,7 +91,7 @@ contains
     integer, intent(in), optional :: Nedf
     character(len=12), optional, intent(in) :: model
     double precision, optional, intent(in) :: epsilon, Hfield
-    integer, optional, intent(in) :: n_moments
+    integer, optional, intent(in) :: n_pmoments, n_hmoments
     double precision :: vmin_final
 
     if (present(vmin)) then
@@ -104,7 +106,7 @@ contains
        allocate(this%edf(Nedf))
        this%e_min = 0.d0
        this%e_max = max(vmin_final,vmax)**2*0.5d0 + 1.d0
-       this%de = (this%e_max - this%e_min)/(Nedf-1)
+       this%de = (this%e_max - this%e_min)/ Nedf
     end if
 
     if (present(model)) then
@@ -128,10 +130,17 @@ contains
 
     end if
 
-    if (present(n_moments)) then
-       if (n_moments .gt. 0) then
-          allocate(this%pn(n_moments))
+    if (present(n_pmoments)) then
+       if (n_pmoments .gt. 0) then
+          allocate(this%pn(n_pmoments))
           this%pn = 0.d0
+       end if
+    end if
+
+    if (present(n_hmoments)) then
+       if (n_hmoments .gt. 0) then
+          allocate(this%hn(n_hmoments))
+          this%hn = 0.d0
        end if
     end if
 
@@ -187,15 +196,23 @@ contains
 
     integer :: i,m
     double precision :: loopf
-    integer :: n, n_moments
-    logical :: do_pn
+    integer :: n, n_pmoments, n_hmoments
+    logical :: do_pn, do_hn
 
     if (allocated(this%pn)) then
        this%pn = 0.d0
        do_pn = .true.
-       n_moments = size(this%pn)
+       n_pmoments = size(this%pn)
     else
        do_pn = .false.
+    end if
+
+    if (allocated(this% hn)) then
+       this% hn = 0
+       do_hn = .true.
+       n_hmoments = size(this% hn)
+    else
+       do_hn = .false.
     end if
 
     if (this%is_ext) then
@@ -215,8 +232,16 @@ contains
           this%I2 = this%I2 + loopf**2
           this%I3 = this%I3 + loopf**3
           if (do_pn) then
-             do n=1,n_moments
+             do n=1,n_pmoments
                 this%pn(n) = this%pn(n) + (get_v(this%V, m)**n) * loopf
+             end do
+          end if
+          if (do_hn) then
+             do n=1,n_hmoments
+                this%hn(n) = this%hn(n) + ( &
+                     get_v(this%V, m)**2*0.5d0 + &
+                     (1.d0 - this% Mx * cos(get_x(this%V, i)) - this% My * sin(get_x(this%V, i))) &
+                     )**n * loopf
              end do
           end if
           if (loopf.gt.0.d0 .and. loopf.lt.this%f0) then
@@ -234,9 +259,10 @@ contains
     this%entropy  = this%entropy         * this%V%dx * this%V%dv
     this%V%energie = this%V%en_int + this%V%en_kin
     if (do_pn) then
-       do n=1,n_moments
-          this%pn(n) = this%pn(n) * this%V%dx * this%V%dv
-       end do
+       this%pn = this%pn * this%V%dx * this%V%dv
+    end if
+    if (do_hn) then
+       this% hn = this%hn * this%V%dx * this%V%dv
     end if
 
   end subroutine compute_phys

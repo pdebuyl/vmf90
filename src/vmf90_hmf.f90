@@ -33,7 +33,7 @@ program runHMF
   double precision :: beta, fzero, ics
   double precision :: vmax, DT
   integer :: i,m,t,t_top, n_images, t_images
-  integer :: n_moments
+  integer :: n_pmoments, n_hmoments
   integer :: n_steps, n_top
   
   double precision :: norme
@@ -41,7 +41,7 @@ program runHMF
   character(len=32) :: IC
 
   integer(HID_T) :: file_ID
-  type(h5md_t) :: mass_ID, energy_ID, int_ID, kin_ID, momentum_ID, Mx_ID, My_ID, I2_ID, I3_ID, pn_ID
+  type(h5md_t) :: mass_ID, energy_ID, int_ID, kin_ID, momentum_ID, Mx_ID, My_ID, I2_ID, I3_ID, pn_ID, hn_ID
   type(h5md_t) :: edf_ID
   type(h5md_t) :: f_ID, rho_ID, phi_ID
 
@@ -57,10 +57,11 @@ program runHMF
   IC = PTread_s(HCF,'IC')
   n_images = PTread_i(HCF, 'n_images')
   t_images = 1
-  n_moments = PTread_i(HCF, 'n_moments')
+  n_pmoments = PTread_i(HCF, 'n_pmoments')
+  n_hmoments = PTread_i(HCF, 'n_hmoments')
 
   call newHMF(H,Nx,Nv,vmax, Nedf=PTread_i(HCF,'Nedf'), model=PTread_s(HCF, 'model'), &
-       Hfield=PTread_d(HCF,'Hfield'), n_moments=n_moments)
+       Hfield=PTread_d(HCF,'Hfield'), n_pmoments=n_pmoments, n_hmoments=n_hmoments)
   H%V%DT = DT
 
   call h5md_create_file(file_ID, 'hmf.h5', 'Pierre de Buyl <pdebuyl@ulb.ac.be>', 'vmf90_hmf', trim(vmf90_version()))
@@ -218,9 +219,12 @@ contains
     call h5md_create_obs(file_ID, 'My', My_ID, H%My, link_from='mass')
     call h5md_create_obs(file_ID, 'I2', I2_ID, H%I2, link_from='mass')
     call h5md_create_obs(file_ID, 'I3', I3_ID, H%I3, link_from='mass')
-    call h5md_create_obs(file_ID, 'edf', edf_ID, H%edf, link_from='mass')
+    call h5md_create_obs(file_ID, 'edf', edf_ID, H%edf)
     if (allocated(H%pn)) then
        call h5md_create_obs(file_ID, 'pn', pn_ID, H%pn, link_from='mass')
+    end if
+    if (allocated(H%hn)) then
+       call h5md_create_obs(file_ID, 'hn', hn_ID, H%hn, link_from='mass')
     end if
 
     call create_fields_group(file_ID)
@@ -241,6 +245,9 @@ contains
     call h5md_write_obs(I3_ID, H%I3, t_top, realtime)
     if (allocated(H%pn)) then
        call h5md_write_obs(pn_ID, H%pn, t_top, realtime)
+    end if
+    if (allocated(H%hn)) then
+       call h5md_write_obs(hn_ID, H%hn, t_top, realtime)
     end if
   end subroutine write_obs
 
