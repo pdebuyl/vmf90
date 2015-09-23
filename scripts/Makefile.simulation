@@ -25,6 +25,9 @@ endif
 ifneq ($(origin N_IMAGES), undefined)
 WB_ARGS += --n-images $(N_IMAGES)
 endif
+ifneq ($(origin N_EDF), undefined)
+WB_ARGS += --n-edf $(N_EDF)
+endif
 
 variables:
 	@echo VMF90 $(VMF90)

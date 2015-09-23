@@ -31,6 +31,7 @@ parser.add_argument('--nv', type=int, default=256)
 parser.add_argument('--n-moments', type=int, default=0)
 parser.add_argument('--n-images', type=int, default=10)
 parser.add_argument('--n-top', type=int, default=100)
+parser.add_argument('--n-edf', type=int, default=0)
 args = parser.parse_args()
 
 import numpy as np
@@ -67,7 +68,7 @@ n_images = {n_images}
 IC = waterbag
 width = {Dth}
 bag = {Dp}
-Nedf = 0 
+Nedf = {n_edf}
 Hfield = 0.1
 n_moments = {n_moments}
 """.format(**values)
