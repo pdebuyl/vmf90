@@ -27,7 +27,7 @@ if (len(argv)<3):
   exit()
 
 cmd = argv[2]
-if (cmd not in ['plot','snaps','dump']):
+if (cmd not in ['plot','snaps','dump', 'dist']):
   print "Command %s unknown" % (cmd,)
   exit()
 
@@ -49,6 +49,8 @@ xmax = a['parameters']['xmax'].value
 vmin = a['parameters']['vmin'].value
 vmax = a['parameters']['vmax'].value
 extent = [xmin,xmax,vmin,vmax]
+emin = a['parameters']['e_min'].value
+de = a['parameters']['de'].value
 
 plt.rc('figure.subplot', left = 0.17)
 f = plt.figure(figsize=[8.,4.5])
@@ -103,6 +105,23 @@ elif (cmd == 'dump'):
       print "\n" ,
   else:
     print "available observables: ", a['observables'].keys()
+
+elif cmd == 'dist':
+  dist = argv[3]
+  if dist == 'edf':
+    er = emin + np.arange(a['observables']['edf']['value'].shape[1]) * de
+    n = a['observables']['edf']['value'].shape[0]
+    print 'n', n
+    for i in range(4):
+      s = (i*n) / 4
+      plt.plot(er, a['observables']['edf']['value'][s], label=r'$t=%f$' % a['observables']['edf']['time'][s])
+      print s, a['observables']['edf']['time'][s]
+    plt.xlabel(r'$h = p^2/2 + (1 - M_x \cos\theta - M_y \sin\theta)$')
+    plt.ylabel(r'$P(h)$')
+    plt.legend()
+    do_show = True
+  else:
+    print "unknown distribution %s", dist
 
 a.close()
 
