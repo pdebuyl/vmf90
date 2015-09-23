@@ -28,7 +28,8 @@ parser.add_argument('M0', type=float)
 parser.add_argument('U', type=float)
 parser.add_argument('--nx', type=int, default=256)
 parser.add_argument('--nv', type=int, default=256)
-parser.add_argument('--n-moments', type=int, default=0)
+parser.add_argument('--n-pmoments', type=int, default=0)
+parser.add_argument('--n-hmoments', type=int, default=0)
 parser.add_argument('--n-images', type=int, default=10)
 parser.add_argument('--n-top', type=int, default=100)
 parser.add_argument('--n-edf', type=int, default=0)
@@ -70,7 +71,8 @@ width = {Dth}
 bag = {Dp}
 Nedf = {n_edf}
 Hfield = 0.1
-n_moments = {n_moments}
+n_pmoments = {n_pmoments}
+n_hmoments = {n_hmoments}
 """.format(**values)
 
 Dtheta = solve_for_Dtheta(args.M0)

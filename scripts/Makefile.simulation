@@ -19,8 +19,11 @@ endif
 ifneq ($(origin NV), undefined)
 WB_ARGS += --nv $(NV)
 endif
-ifneq ($(origin N_MOMENTS), undefined)
-WB_ARGS += --n-moments $(N_MOMENTS)
+ifneq ($(origin N_PMOMENTS), undefined)
+WB_ARGS += --n-pmoments $(N_PMOMENTS)
+endif
+ifneq ($(origin N_HMOMENTS), undefined)
+WB_ARGS += --n-hmoments $(N_HMOMENTS)
 endif
 ifneq ($(origin N_IMAGES), undefined)
 WB_ARGS += --n-images $(N_IMAGES)
