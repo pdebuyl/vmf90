@@ -104,7 +104,7 @@ contains
 
     if (present(Nedf).and.Nedf.gt.1) then
        allocate(this%edf(Nedf))
-       this%e_min = 0.d0
+       this%e_min = -1.d0
        this%e_max = max(vmin_final,vmax)**2*0.5d0 + 1.d0
        this%de = (this%e_max - this%e_min)/ Nedf
     end if
