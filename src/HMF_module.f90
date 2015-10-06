@@ -195,7 +195,7 @@ contains
     type(HMF), intent(inout) :: this
 
     integer :: i,m
-    double precision :: loopf
+    double precision :: loopf, looph
     integer :: n, n_pmoments, n_hmoments
     logical :: do_pn, do_hn
 
@@ -237,11 +237,9 @@ contains
              end do
           end if
           if (do_hn) then
+             looph = single_h(get_v(this%V, m), get_x(this%V, i), this% Mx, this% My, this% epsilon, this% Hfield)
              do n=1,n_hmoments
-                this%hn(n) = this%hn(n) + ( &
-                     get_v(this%V, m)**2*0.5d0 + &
-                     (1.d0 - this% Mx * cos(get_x(this%V, i)) - this% My * sin(get_x(this%V, i))) &
-                     )**n * loopf
+                this%hn(n) = this%hn(n) + looph**n * loopf
              end do
           end if
           if (loopf.gt.0.d0 .and. loopf.lt.this%f0) then
@@ -280,14 +278,20 @@ contains
     this%edf=0.d0
     do i=1,this%V%Nx
        do m=1,this%V%Nv
-          h = get_v(this%V,m)**2*0.5d0 &
-               + this%epsilon*(1.d0-(this%Mx*cos(get_x(this%V,i))+this%My*sin(get_x(this%V,i)))) &
-               + this%Hfield*(1.d0-cos(get_x(this%V,i)))
+          h = single_h(get_v(this%V,m), get_x(this%V,i), this% Mx, this% My, this% epsilon, this% Hfield)
           pos = max(min(floor((h-this%e_min)/this%de),size(this%edf)-1)+1, 1)
           this%edf(pos) = this%edf(pos) + this%V%f(i,m)*this%V%dx*this%V%dv/this%de
        end do
     end do
      
   end subroutine compute_edf
+
+  pure function single_h(p, theta, Mx, My, epsilon, Hfield) result(h)
+    double precision, intent(in) :: p, theta, Mx, My, epsilon, Hfield
+    double precision :: h
+
+    h = p**2 / 2 - epsilon * (Mx*cos(theta) + My*sin(theta)) + Hfield*cos(theta)
+
+  end function single_h
 
 end module HMF_module
