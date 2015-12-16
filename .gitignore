@@ -10,3 +10,5 @@
 /doc/html
 
 MANIFEST
+
+doxygen_sqlite3.db
