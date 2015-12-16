@@ -19,3 +19,4 @@ This documentation contains:
 - The [syntax](\ref config_file_syntax) for the configuration files.
 - The [README](\ref README) file of the project.
 - The [LICENSE](\ref license) file of the project.
+- The [release notes](\ref release_notes).
